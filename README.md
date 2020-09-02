@@ -1,2 +1,2 @@
-# BeMovile-app
-BeMovile-app-api
+# BeMovil-app
+BeMovil-app-api
