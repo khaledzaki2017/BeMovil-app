@@ -20,9 +20,11 @@ from django.conf.urls.static import static
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('user-detail-form/',
-         include('multi_step_form.urls', namespace='multi_step_form')),
-    path('pdf-results/', include('pdf_results.urls', namespace='pdf_results'))
+    path('form/', include('multi_step_form.urls')),
+
+    # path('user-detail-form/',
+    #      include('multi_step_form.urls', namespace='multi_step_form')),
+    # path('pdf-results/', include('pdf_results.urls', namespace='pdf_results'))
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

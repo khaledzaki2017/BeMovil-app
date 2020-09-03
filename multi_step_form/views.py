@@ -1,77 +1,49 @@
-#from django.shortcuts import render
-from uuid import uuid4
-from django.views.generic import FormView
-from django.urls import reverse_lazy
-from core.models import UserPictures
-from multi_step_form.forms import Step1Form, Step2Form, Step3Form
+from rest_framework.decorators import action
+from rest_framework.response import Response
+from rest_framework import viewsets, mixins, status
+from rest_framework.authentication import TokenAuthentication
+from rest_framework.permissions import IsAuthenticated
 
-# Create your views here.
-
-
-class FormStep1(FormView):
-    form_class = Step1Form
-    success_url = reverse_lazy('multi_step_form:step_2')
-    template_name = 'multi_step_form/step1.html'
-
-    def get_initial(self):
-        initials = super(FormStep1, self).get_initial()
-        initials.update({
-            'first_name': self.request.session.get('first_name', None),
-            'last_name': self.request.session.get('last_name', None),
-        })
-        return initials
-
-    def form_valid(self, form):
-        post_data = self.request.POST
-        if form.is_valid():
-            self.request.session['first_name'] = post_data['first_name']
-            self.request.session['last_name'] = post_data['last_name']
-            if not self.request.session.get('user_uuid', None):
-                self.request.session['user_uuid'] = str(uuid4())
-        return super(FormStep1, self).form_valid(form)
+from core.models import Step1FormModel, Step2FormModel, Step3FormModel, UserPictures
+from multi_step_form import serializers
 
 
-class FormStep2(FormView):
-    form_class = Step2Form
-    success_url = reverse_lazy('multi_step_form:step_3')
-    template_name = 'multi_step_form/step2.html'
-
-    def get_initial(self):
-        initials = super(FormStep2, self).get_initial()
-        initials.update({
-            'local_address': self.request.session.get('local_address', None),
-            'permanent_address': self.request.session.get('permanent_address', None),
-        })
-        return initials
-
-    def form_valid(self, form):
-        post_data = self.request.POST
-        if form.is_valid():
-            self.request.session['local_address'] = post_data['local_address']
-            self.request.session['permanent_address'] = post_data['permanent_address']
-        return super(FormStep2, self).form_valid(form)
+class Step1ViewSet(viewsets.ModelViewSet):
+    queryset = Step1FormModel.objects.all()
+    serializer_class = serializers.Step1FormSerializer
 
 
-class FormStep3(FormView):
-    form_class = Step3Form
-    success_url = reverse_lazy('pdf_results:pdf')
-    template_name = 'multi_step_form/step3.html'
+class Step2ViewSet(viewsets.ModelViewSet):
+    queryset = Step2FormModel.objects.all()
+    serializer_class = serializers.Step2FormSerializer
 
-    def get_context_data(self, **kwargs):
-        context_data = super(FormStep3, self).get_context_data(**kwargs)
-        user_uuid = self.request.session.get('user_uuid')
-        context_data['user_images'] = UserPictures.objects.filter(
-            user_uuid=user_uuid)
-        return context_data
 
-    def form_valid(self, form):
-        request_files = self.request.FILES.getlist('images')
-        if form.is_valid():
-            user_uuid = self.request.session.get('user_uuid')
-            # clear the last user pictures
-            UserPictures.objects.filter(
-                user_uuid=user_uuid).delete()
-            for image in request_files:
-                UserPictures.objects.create(user_uuid=user_uuid,
-                                            image=image)
-        return super(FormStep3, self).form_valid(form)
+class Step3ViewSet(viewsets.ModelViewSet):
+    queryset = Step3FormModel.objects.all()
+    serializer_class = serializers.Step3FormSerializer
+
+
+class UserPicturesViewSet(viewsets.ModelViewSet):
+    queryset = UserPictures.objects.all()
+    serializer_class = serializers.FormImageSerializer
+
+    @action(methods=['POST'], detail=True, url_path='upload-image')
+    def upload_image(self, request, pk=None):
+        """Upload an image to a form"""
+        form = self.get_object()
+        serializer = self.get_serializer(
+            form,
+            data=request.data
+        )
+
+        if serializer.is_valid():
+            serializer.save()
+            return Response(
+                serializer.data,
+                status=status.HTTP_200_OK
+            )
+
+        return Response(
+            serializer.errors,
+            status=status.HTTP_400_BAD_REQUEST
+        )
