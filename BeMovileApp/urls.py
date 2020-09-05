@@ -21,10 +21,8 @@ from django.conf.urls.static import static
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('form/', include('multi_step_form.urls')),
-
-    # path('user-detail-form/',
-    #      include('multi_step_form.urls', namespace='multi_step_form')),
-    # path('pdf-results/', include('pdf_results.urls', namespace='pdf_results'))
+    path('pdf/', include('pdf_results.urls')),
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

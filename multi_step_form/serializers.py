@@ -40,7 +40,7 @@ class Step3FormSerializer(serializers.ModelSerializer):
 
 
 class FormImageSerializer(serializers.ModelSerializer):
-    """Serializer for uploading images to forms"""
+    """Serializer for uploading images """
 
     class Meta:
         model = UserPictures

@@ -1,8 +1,6 @@
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from rest_framework import viewsets, mixins, status
-from rest_framework.authentication import TokenAuthentication
-from rest_framework.permissions import IsAuthenticated
+from rest_framework import viewsets, status
 
 from core.models import Step1FormModel, Step2FormModel, Step3FormModel, UserPictures
 from multi_step_form import serializers
@@ -11,6 +9,15 @@ from multi_step_form import serializers
 class Step1ViewSet(viewsets.ModelViewSet):
     queryset = Step1FormModel.objects.all()
     serializer_class = serializers.Step1FormSerializer
+
+#    def getInitialdata(self, request, *args, **kwargs):
+#        sk = request.GET.get('sk', '')
+#        data = request.get_serializer
+#        if data:
+#           s = SessionStore(session_key=sk)
+#           s.delete()
+#             return Response({'result': data})
+#        return Response({'result': 'no data'})
 
 
 class Step2ViewSet(viewsets.ModelViewSet):
