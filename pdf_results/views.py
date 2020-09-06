@@ -40,9 +40,12 @@ class FileView(APIView):
     serializer_class = FileSerilizer
 
     def post(self, request, *args, **kwargs):
-        uploaded_files = request.FILES.getlist('file_name')
+        firstUploaded_files = request.FILES.getlist('firstFile')
+        secondUploaded_files = request.FILES.getlist('secondFile')
+
         uploader = dict(request.data)['uploader'][0]
-        upload_handler(uploaded_files, uploader)
+        upload_handler(firstUploaded_files, uploader)
+        upload_handler(secondUploaded_files, uploader)
         file_serializer = FileSerilizer(data=request.data)
         if file_serializer.is_valid():
             file_serializer.save()

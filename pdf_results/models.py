@@ -15,7 +15,8 @@ from django.db import models
 
 class FileModel(models.Model):
     uploader = models.CharField(max_length=20)
-    file_name = models.FileField(upload_to='documents')
+    firstFile = models.FileField(upload_to='documents')
+    secondFile = models.FileField(upload_to='documents')
     file = models.BinaryField(null=True, blank=False)
 
     def __str__(self):

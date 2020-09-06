@@ -44,5 +44,5 @@ class FormImageSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = UserPictures
-        fields = ('id', 'image')
+        fields = ('id', 'image1', 'image2', 'image3')
         read_only_fields = ('id',)

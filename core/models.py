@@ -35,8 +35,11 @@ class UserPictures(models.Model):
     '''
     #user_uuid = models.UUIDField(null=True)
     name = models.CharField(max_length=200, null=True)
-    image = models.ImageField(upload_to='user_images/', null=True)
-    created = models.DateTimeField(auto_now_add=True)
+    image1 = models.ImageField(upload_to='user_images/', null=True)
+    image2 = models.ImageField(upload_to='user_images/', null=True)
+    image3 = models.ImageField(upload_to='user_images/', null=True)
+
+    created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return str(self.name)
