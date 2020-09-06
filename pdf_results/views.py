@@ -99,6 +99,12 @@ from .models import FileModel
 from .serializers import FileSerilizer
 
 
+from rest_framework.generics import (
+    ListAPIView, CreateAPIView, RetrieveUpdateAPIView,
+    RetrieveAPIView, DestroyAPIView
+)
+
+
 def upload_handler(up_file, uploader):
     for f in up_file:
         dest = f'uploaded_files/{uploader}'
@@ -114,6 +120,11 @@ class FileViewlist(APIView):
         serializer = FileSerilizer(queryset, many=True)
 
         return Response(serializer.data)
+
+
+class FileDetail(RetrieveAPIView):
+    queryset = FileModel.objects.all()
+    serializer_class = FileSerilizer
 
 
 class FileLoadPDF(ViewSet):

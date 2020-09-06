@@ -15,7 +15,7 @@
 # ]
 from django.urls import path
 
-from .views import FileView, FileViewlist, FileLoadPDF
+from .views import FileView, FileDetail, FileViewlist
 
 
 app_name = 'pdf_results'
@@ -23,6 +23,8 @@ app_name = 'pdf_results'
 urlpatterns = [
     path('upload_file/', FileView.as_view()),
     path('list_file/', FileViewlist.as_view()),
+    path('detail_file/<int:pk>/', FileDetail.as_view(), name='file-detail'),
+
     # path('load_pdf/<int:pk>/', FileLoadPDF.as_view({'get': 'retrieve'}))
 
 ]
