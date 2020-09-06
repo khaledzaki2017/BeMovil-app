@@ -1,3 +1,70 @@
+import os
+
+from rest_framework import status
+from rest_framework.views import APIView
+from rest_framework.viewsets import ViewSet
+from rest_framework import viewsets, status
+from rest_framework.decorators import action
+
+from rest_framework.response import Response
+from django.http.response import HttpResponseRedirect
+from drf_pdf.renderer import PDFRenderer
+from drf_pdf.response import PDFResponse
+from io import BytesIO
+from base64 import b64encode, b64decode
+from django.core.files.base import ContentFile
+from django.core.files.storage import default_storage
+from rest_framework.parsers import MultiPartParser, FormParser
+from .models import FileModel
+
+from .serializers import FileSerilizer
+
+
+from rest_framework.generics import (
+    ListAPIView, CreateAPIView, RetrieveUpdateAPIView,
+    RetrieveAPIView, DestroyAPIView
+)
+
+
+def upload_handler(up_file, uploader):
+    for f in up_file:
+        dest = f'uploaded_files/{uploader}'
+        if not os.path.exists(dest):
+            os.makedirs(dest)
+        default_storage.save(f'{dest}/{f}', ContentFile(f.read()))
+
+
+class FileView(APIView):
+    parser_classes = (MultiPartParser, FormParser,)
+    queryset = FileModel.objects.all()
+    serializer_class = FileSerilizer
+
+    def post(self, request, *args, **kwargs):
+        uploaded_files = request.FILES.getlist('file_name')
+        uploader = dict(request.data)['uploader'][0]
+        upload_handler(uploaded_files, uploader)
+        file_serializer = FileSerilizer(data=request.data)
+        if file_serializer.is_valid():
+            file_serializer.save()
+            return Response(file_serializer.data, status=status.HTTP_201_CREATED)
+        else:
+            return Response(file_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class FileViewlist(APIView):
+
+    def get(self, request):
+        queryset = FileModel.objects.all()
+        serializer = FileSerilizer(queryset, many=True)
+
+        return Response(serializer.data)
+
+
+class FileDetail(RetrieveAPIView):
+    queryset = FileModel.objects.all()
+    serializer_class = FileSerilizer
+
+
 # from io import BytesIO
 # from base64 import b64encode, b64decode
 # from django.http.response import HttpResponseRedirect
@@ -80,82 +147,46 @@
 # #     if pisa_status.err:
 # #         return HttpResponse('We had some errors <pre>' + html + '</pre>')
 # #     return response
-import os
 
-from rest_framework import status
-from rest_framework.views import APIView
-from rest_framework.viewsets import ViewSet
-from rest_framework.response import Response
-from django.http.response import HttpResponseRedirect
-from drf_pdf.renderer import PDFRenderer
-from drf_pdf.response import PDFResponse
-from io import BytesIO
-from base64 import b64encode, b64decode
-from django.core.files.base import ContentFile
-from django.core.files.storage import default_storage
-from rest_framework.parsers import MultiPartParser, FormParser
-from .models import FileModel
+# class FileLoadPDF(ViewSet):
 
-from .serializers import FileSerilizer
+#     renderer_classes = (PDFRenderer, )  # !important
 
+#     def retrieve(self, request, pk):
+#         queryset = FileModel.objects.filter(id=pk).get()
 
-from rest_framework.generics import (
-    ListAPIView, CreateAPIView, RetrieveUpdateAPIView,
-    RetrieveAPIView, DestroyAPIView
-)
+#         bytes = b64decode(queryset.file, validate=True)
 
+#         pdf = BytesIO(bytes)  # Simulating File
 
-def upload_handler(up_file, uploader):
-    for f in up_file:
-        dest = f'uploaded_files/{uploader}'
-        if not os.path.exists(dest):
-            os.makedirs(dest)
-        default_storage.save(f'{dest}/{f}', ContentFile(f.read()))
+#         return PDFResponse(
+#             pdf.getvalue(),
+#             file_name=queryset.uploader,
+#             template_name=queryset.uploader,
+#             status=status.HTTP_200_OK
+#         )
 
+# class FileLoadPDF(viewsets.ModelViewSet):
+#     queryset = FileModel.objects.all()
+#     serializer_class = FileSerilizer
 
-class FileViewlist(APIView):
+#     @action(methods=['POST'], detail=True, url_path='upload-file')
+#     def upload_file(self, request, pk=None):
+#         """Upload an file """
+#         f = self.get_object()
+#         serializer = self.get_serializer(
+#             f,
+#             data=request.data
+#         )
 
-    def get(self, request):
-        queryset = FileModel.objects.all()
-        serializer = FileSerilizer(queryset, many=True)
+#         if serializer.is_valid():
+#             serializer.save()
+#             return Response(
+#                 serializer.data,
+#                 status=status.HTTP_200_OK
+#             )
 
-        return Response(serializer.data)
-
-
-class FileDetail(RetrieveAPIView):
-    queryset = FileModel.objects.all()
-    serializer_class = FileSerilizer
-
-
-class FileLoadPDF(ViewSet):
-
-    renderer_classes = (PDFRenderer, )  # !important
-
-    def retrieve(self, request, pk):
-        queryset = FileModel.objects.filter(id=pk).get()
-
-        bytes = b64decode(queryset.file, validate=True)
-
-        pdf = BytesIO(bytes)  # Simulating File
-
-        return PDFResponse(
-            pdf.getvalue(),
-            file_name=queryset.uploader,
-            template_name=queryset.uploader,
-            status=status.HTTP_200_OK
-        )
-
-
-class FileView(APIView):
-    parser_classes = (MultiPartParser, FormParser,)
-
-    def post(self, request, *args, **kwargs):
-        uploaded_files = request.FILES.getlist('file_name')
-        uploader = dict(request.data)['uploader'][0]
-        upload_handler(uploaded_files, uploader)
-        file_serializer = FileSerilizer(data=request.data)
-        if file_serializer.is_valid():
-            file_serializer.save()
-            return Response(file_serializer.data, status=status.HTTP_201_CREATED)
-        else:
-            return Response(file_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+#         return Response(
+#             serializer.errors,
+#             status=status.HTTP_400_BAD_REQUEST
+#         )
