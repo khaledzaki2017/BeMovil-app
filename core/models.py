@@ -6,6 +6,7 @@ import time
 
 
 class WizardFormModel(models.Model):
+    # client_id=models.UUIDField(null=True)
     firstname = models.CharField(max_length=100, null=True)
     lastname = models.CharField(max_length=100, null=True)
     bemovil_id = models.IntegerField(null=True)

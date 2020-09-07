@@ -18,7 +18,7 @@ from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 
 from multi_step_form import views
-
+from .views import ValidatePhoneSendOTP
 
 router = DefaultRouter()
 router.register('wizard', views.WizardFormViewSet)
@@ -32,5 +32,7 @@ app_name = 'multi_step_form'
 
 
 urlpatterns = [
-    path('', include(router.urls))
+    path('', include(router.urls)),
+    path('validate_phone/', ValidatePhoneSendOTP.as_view()),
+
 ]

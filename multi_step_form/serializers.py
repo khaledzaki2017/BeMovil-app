@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from core.models import WizardFormModel
+from core.models import WizardFormModel, PhoneOTP
 # ,Step1FormModel, Step2FormModel, Step3FormModel, UserPictures
 
 
@@ -11,6 +11,13 @@ class WizardFormSerializer(serializers.ModelSerializer):
 
         read_only_fields = ('id',)
 
+
+class PhoneOTPSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PhoneOTP
+        fields = '__all__'
+
+        read_only_fields = ('id',)
 
 # class Step1FormSerializer(serializers.ModelSerializer):
 #     """Serializer for Step1Form objects"""

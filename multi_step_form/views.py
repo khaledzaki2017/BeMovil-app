@@ -88,33 +88,33 @@ class ValidatePhoneSendOTP(APIView):
         phone_num = request.data.get('phone_number')
         if phone_num:
             phone_number = str(phone_num)
-            user = User.objects.filter(phone__iexact=phone_number)
-            if user.exists():
-                return Response({'status': False, 'detail': 'phone number already exist'})
-            else:
-                key = send_otp(phone_number)
-                if key:
-                    old = PhoneOTP.objects.filter(phone__iexact=phone_number)
-                    if old.exists():
-                        old = old.first()
-                        count = old.count
-                        if count > 10:
-                            return Response({'status': False, 'detail': 'sending OTP limit exceeded'})
-                        else:
-                            old.count = count + 1
-                            old.save()
-                            return Response({'status': True, 'detail': 'OTP sended successfully'})
-
+            # user = User.objects.filter(phone__iexact=phone_number)
+            # if user.exists():
+            #     return Response({'status': False, 'detail': 'phone number already exist'})
+            # else:
+            key = send_otp(phone_number)
+            if key:
+                old = PhoneOTP.objects.filter(phone__iexact=phone_number)
+                if old.exists():
+                    old = old.first()
+                    count = old.count
+                    if count > 10:
+                        return Response({'status': False, 'detail': 'sending OTP limit exceeded'})
                     else:
-
-                        PhoneOTP.objects.create(
-                            phone_number=phone_number,
-                            otp=key
-                        )
+                        old.count = count + 1
+                        old.save()
                         return Response({'status': True, 'detail': 'OTP sended successfully'})
 
                 else:
-                    return Response({'status': False, 'detail': 'sending otp has error'})
+
+                    PhoneOTP.objects.create(
+                        phone_number=phone_number,
+                        otp=key
+                    )
+                    return Response({'status': True, 'detail': 'OTP sended successfully'})
+
+            else:
+                return Response({'status': False, 'detail': 'sending otp has error'})
 
         else:
             return Response({'status': False, 'detail': 'phone number is not givin in the request'})
