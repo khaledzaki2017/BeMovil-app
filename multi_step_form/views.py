@@ -1,8 +1,9 @@
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework import viewsets, status
+import random
 
-from core.models import WizardFormModel
+from core.models import WizardFormModel, PhoneOTP
 #  Step1FormModel, Step2FormModel, Step3FormModel, UserPictures
 from multi_step_form import serializers
 
@@ -81,11 +82,48 @@ class WizardFormViewSet(viewsets.ModelViewSet):
 #             status=status.HTTP_400_BAD_REQUEST
 #         )
 
-# class ValidatePhoneSendOTP(APIView):
+class ValidatePhoneSendOTP(APIView):
+
+    def post(self, request, *args, **kwargs):
+        phone_num = request.data.get('phone_number')
+        if phone_num:
+            phone_number = str(phone_num)
+            user = User.objects.filter(phone__iexact=phone_number)
+            if user.exists():
+                return Response({'status': False, 'detail': 'phone number already exist'})
+            else:
+                key = send_otp(phone_number)
+                if key:
+                    old = PhoneOTP.objects.filter(phone__iexact=phone_number)
+                    if old.exists():
+                        old = old.first()
+                        count = old.count
+                        if count > 10:
+                            return Response({'status': False, 'detail': 'sending OTP limit exceeded'})
+                        else:
+                            old.count = count + 1
+                            old.save()
+                            return Response({'status': True, 'detail': 'OTP sended successfully'})
+
+                    else:
+
+                        PhoneOTP.objects.create(
+                            phone_number=phone_number,
+                            otp=key
+                        )
+                        return Response({'status': True, 'detail': 'OTP sended successfully'})
+
+                else:
+                    return Response({'status': False, 'detail': 'sending otp has error'})
+
+        else:
+            return Response({'status': False, 'detail': 'phone number is not givin in the request'})
 
 
-#     def post(self, request, *args, **kwargs):
-#         phone_num = request.data.get('phone')
-#         if phone_num:
-#             phone = str(phone_num)
-#             user=User.objects.filter(phon)
+def send_otp(phone):
+    if phone:
+        key = random.randint(999, 9999)
+        print(key)
+        return key
+    else:
+        return False

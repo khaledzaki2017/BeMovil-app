@@ -1,4 +1,6 @@
 from django.db import models
+from django.db.models.signals import pre_save
+import time
 
 # Create your models here.
 
@@ -23,6 +25,29 @@ class WizardFormModel(models.Model):
 
     def __str__(self):
         return str(self.firstname)
+
+
+class PhoneOTP(models.Model):
+    # phone_regex = RegexValidator(regex=r'^\+?234?\d(9,14)$',
+    #     message="Phone number must be entered in format of +2348044234244 up to 14 digits")
+    # phone = models.CharField(validator=[phone_regex], max_length=15, unique=True)
+    phone_number = models.CharField(max_length=15, unique=True)
+    otp = models.CharField(max_length=6)
+    initial = models.IntegerField(blank=True, null=True)
+    last = models.IntegerField(blank=True, null=True)
+    validated = models.BooleanField(default=False)
+    count = models.IntegerField(blank=True, null=True)
+
+    def __str__(self):
+        return f'{self.phone_number} is sent {self.otp}'
+
+
+def add_timer(sender, instance, *args, **kwargs):
+    instance.initial = int(time.time())
+    instance.last = instance.initial + 30
+
+
+pre_save.connect(add_timer, sender=PhoneOTP)
 
 
 # class Step2FormModel(models.Model):
