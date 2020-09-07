@@ -13,7 +13,7 @@
 # urlpatterns = [
 #     path('', include(router.urls))
 # ]
-from django.urls import path, include
+from django.urls import path
 
 from .views import FileView, FileDetail, FileViewlist
 
