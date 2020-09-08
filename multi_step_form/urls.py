@@ -15,13 +15,13 @@
 #     # path('step-3', FormStep3.as_view(), name='step_3'),
 # ]
 from django.urls import path, include
-from rest_framework.routers import DefaultRouter
+from rest_framework import routers
 
 from multi_step_form import views
 from .views import ValidatePhoneSendOTP
 
-router = DefaultRouter()
-router.register('wizard', views.WizardFormViewSet)
+router = routers.SimpleRouter()
+router.register('wizard', views.WizardFormViewSet, base_name='wizard')
 
 # router.register('step1', views.Step1ViewSet)
 # router.register('step2', views.Step2ViewSet)

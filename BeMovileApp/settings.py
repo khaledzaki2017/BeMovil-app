@@ -42,7 +42,9 @@ INSTALLED_APPS = [
     'core',
     'wkhtmltopdf',
     'multi_step_form',
-    'pdf_results'
+    'pdf_results',
+    'drf_multiple_model',
+
 ]
 
 MIDDLEWARE = [
