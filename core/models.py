@@ -33,7 +33,7 @@ class PhoneOTP(models.Model):
     # phone_regex = RegexValidator(regex=r'^\+?234?\d(9,14)$',
     #     message="Phone number must be entered in format of +2348044234244 up to 14 digits")
     # phone = models.CharField(validator=[phone_regex], max_length=15, unique=True)
-    phone_number = models.CharField(max_length=15, unique=True)
+    phone = models.CharField(max_length=15, unique=True)
     otp = models.CharField(max_length=6)
     initial = models.IntegerField(blank=True, null=True)
     last = models.IntegerField(blank=True, null=True)

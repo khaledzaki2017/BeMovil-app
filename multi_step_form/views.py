@@ -101,16 +101,16 @@ class WizardFormViewSet(ObjectMultipleModelAPIViewSet):
 class ValidatePhoneSendOTP(APIView):
 
     def post(self, request, *args, **kwargs):
-        phone_num = request.data.get('phone_number')
+        phone_num = request.data.get('phone')
         if phone_num:
-            phone_number = str(phone_num)
-            # user = User.objects.filter(phone__iexact=phone_number)
+            phone = str(phone_num)
+            # user = User.objects.filter(phone__iexact=phone)
             # if user.exists():
             #     return Response({'status': False, 'detail': 'phone number already exist'})
             # else:
-            key = send_otp(phone_number)
+            key = send_otp(phone)
             if key:
-                old = PhoneOTP.objects.filter(phone__iexact=phone_number)
+                old = PhoneOTP.objects.filter(phone__iexact=phone)
                 if old.exists():
                     old = old.first()
                     count = old.count
@@ -124,7 +124,7 @@ class ValidatePhoneSendOTP(APIView):
                 else:
 
                     PhoneOTP.objects.create(
-                        phone_number=phone_number,
+                        phone=phone,
                         otp=key
                     )
                     return Response({'status': True, 'detail': 'OTP sended successfully'})
