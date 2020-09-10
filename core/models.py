@@ -77,3 +77,13 @@ class UserPictures(models.Model):
 
     def __str__(self):
         return str(self.name)
+
+
+class FileModel(models.Model):
+    uploader = models.CharField(max_length=20)
+    firstFile = models.FileField(upload_to='documents')
+    secondFile = models.FileField(upload_to='documents')
+    file = models.BinaryField(null=True, blank=False)
+
+    def __str__(self):
+        return self.uploader

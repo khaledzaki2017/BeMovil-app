@@ -20,13 +20,13 @@ from rest_framework import routers
 from multi_step_form import views
 from .views import ValidatePhoneSendOTP
 
-router = routers.SimpleRouter()
+router = routers.DefaultRouter()
 router.register('wizard', views.WizardFormViewSet, base_name='wizard')
 
-# router.register('step1', views.Step1ViewSet)
-# router.register('step2', views.Step2ViewSet)
-# router.register('step3', views.Step3ViewSet)
-# router.register('upload-image', views.UserPicturesViewSet)
+router.register('step1', views.Step1ViewSet)
+router.register('step2', views.Step2ViewSet)
+router.register('step3', views.Step3ViewSet)
+router.register('user-image', views.UserPicturesViewSet)
 
 app_name = 'multi_step_form'
 

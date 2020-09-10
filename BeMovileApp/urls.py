@@ -20,8 +20,8 @@ from django.conf.urls.static import static
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('form/', include('multi_step_form.urls')),
-    path('pdf/', include('pdf_results.urls')),
+    path('api/', include('multi_step_form.urls')),
+    # path('pdf/', include('pdf_results.urls')),
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
