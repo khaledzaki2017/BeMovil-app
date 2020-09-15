@@ -3,12 +3,12 @@ from rest_framework.response import Response
 from rest_framework import viewsets, status
 import random
 from rest_framework.views import APIView
-from core.models import PhoneOTP, Step1FormModel, Step2FormModel, Step3FormModel, UserPictures, FileModel
+from core.models import PhoneOTP, WizardForm
 from multi_step_form import serializers
 from drf_multiple_model.viewsets import ObjectMultipleModelAPIViewSet
 
 import os
-
+from rest_framework import generics
 from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.viewsets import ViewSet
@@ -26,13 +26,58 @@ from django.core.files.storage import default_storage
 from rest_framework.parsers import MultiPartParser, FormParser
 # from .models import FileModel
 
-from .serializers import FileSerilizer
 
+from django.contrib.auth.models import AnonymousUser
 
 from rest_framework.generics import (
     ListAPIView, CreateAPIView, RetrieveUpdateAPIView,
     RetrieveAPIView, DestroyAPIView
 )
+from rest_framework.authentication import TokenAuthentication
+
+from django_filters import rest_framework as filters
+
+# class JSONWebTokenAuthentication(TokenAuthentication):
+#     def authenticate_credentials(self, jwtToken):
+#         try:
+#             payload = jwt.decode(jwtToken, secret_key, verify=True)
+#             # user = User.objects.get(username='root')
+#             user = AnonymousUser()
+#         except (jwt.DecodeError, User.DoesNotExist):
+#             raise exceptions.AuthenticationFailed('Invalid token)
+#         except jwt.ExpiredSignatureError:
+#             raise exceptions.AuthenticationFailed('Token has expired')
+#         return (user, payload)
+
+
+from rest_framework import authentication
+from rest_framework import exceptions
+from rest_framework.authtoken.models import Token
+
+
+class Authentication(authentication.BaseAuthentication):
+    def authenticate(self, request):
+        auth = authentication.get_authorization_header(request)
+        print("here", auth)
+        if not auth or auth[0].lower() != b'token':
+            return None
+
+        if len(auth) == 1:
+            msg = _('Invalid token header. No credentials provided.')
+            raise exceptions.AuthenticationFailed(msg)
+        elif len(auth) > 2:
+            msg = _(
+                'Invalid token header. Credentials string should not contain spaces.')
+            raise exceptions.AuthenticationFailed(msg)
+
+        try:
+            token = Token.objects.get(token=auth[1])
+            print(token.key)
+
+        except Token.DoesNotExist:
+            raise exceptions.AuthenticationFailed('No such token')
+
+        return (AnonymousUser(), token)
 
 
 # ********************FILE VIEWS******************************
@@ -46,9 +91,10 @@ def upload_handler(up_file, uploader):
 
 
 class FileView(APIView):
+    authentication_classes = (Authentication,)
     parser_classes = (MultiPartParser, FormParser,)
-    queryset = FileModel.objects.all()
-    serializer_class = FileSerilizer
+    queryset = WizardForm.objects.values("firstFile", "secondFile")
+    serializer_class = serializers.FileSerilizer
 
     def post(self, request, *args, **kwargs):
         firstUploaded_files = request.FILES.getlist('firstFile')
@@ -66,17 +112,20 @@ class FileView(APIView):
 
 
 class FileViewlist(APIView):
+    authentication_classes = (Authentication,)
 
     def get(self, request):
-        queryset = FileModel.objects.all()
-        serializer = FileSerilizer(queryset, many=True)
+        queryset = WizardForm.objects.values("firstFile", "secondFile")
+        serializer = serializers.FileSerilizer(queryset, many=True)
 
         return Response(serializer.data)
 
 
 class FileDetail(RetrieveAPIView):
-    queryset = FileModel.objects.all()
-    serializer_class = FileSerilizer
+    authentication_classes = (Authentication,)
+
+    queryset = WizardForm.objects.values("firstFile", "secondFile")
+    serializer_class = serializers.FileSerilizer
 
 # *************************FULL WIZARD DATA ********************************
 
@@ -84,39 +133,45 @@ class FileDetail(RetrieveAPIView):
 class WizardFormViewSet(ObjectMultipleModelAPIViewSet):
 
     querylist = [
-        {'queryset': Step1FormModel.objects.all(
-        ), 'serializer_class': serializers.Step1FormSerializer},
-        {'queryset': Step2FormModel.objects.all(
-        ), 'serializer_class': serializers.Step2FormSerializer},
-        {'queryset': Step3FormModel.objects.all(
-        ), 'serializer_class': serializers.Step3FormSerializer},
-        {'queryset': UserPictures.objects.all(
-        ), 'serializer_class': serializers.FormImageSerializer},
-        {'queryset': FileModel.objects.all(
-        ), 'serializer_class': FileSerilizer}
+        {'queryset': WizardForm.objects.all(
+        ), 'serializer_class': serializers.WizardFormSerializer},
+        {'queryset': PhoneOTP.objects.all(
+        ), 'serializer_class': serializers.PhoneOTPSerializer}
     ]
+
 # *********************************************************************
 
 
-class Step1ViewSet(viewsets.ModelViewSet):
-    queryset = Step1FormModel.objects.all()
-    serializer_class = serializers.Step1FormSerializer
+class TFilter(filters.FilterSet):
+
+    class Meta:
+        model = WizardForm
+        fields = {
+            '_type': ['icontains'],
+        }
 
 
-class Step2ViewSet(viewsets.ModelViewSet):
-    queryset = Step2FormModel.objects.all()
-    serializer_class = serializers.Step2FormSerializer
+class WizardFormListView(viewsets.ModelViewSet):
+    # authentication_classes = (Authentication,)
+    queryset = WizardForm.objects.all()
+    serializer_class = serializers.WizardFormSerializer
+    filterset_class = TFilter
+
+# class Step2ViewSet(viewsets.ModelViewSet):
+#     queryset = Step2FormModel.objects.all()
+#     serializer_class = serializers.Step2FormSerializer
 
 
-class Step3ViewSet(viewsets.ModelViewSet):
-    queryset = Step3FormModel.objects.all()
-    serializer_class = serializers.Step3FormSerializer
+# class Step3ViewSet(viewsets.ModelViewSet):
+#     queryset = Step3FormModel.objects.all()
+#     serializer_class = serializers.Step3FormSerializer
 
 # ********************USER IMAGES VIEW**************
 
 
 class UserPicturesViewSet(viewsets.ModelViewSet):
-    queryset = UserPictures.objects.all()
+    queryset = WizardForm.objects.values('id_image1', 'id_image2', 'client_image1',
+                                         'client_image2', 'client_image3')
     serializer_class = serializers.FormImageSerializer
 
     @action(methods=['POST'], detail=True)

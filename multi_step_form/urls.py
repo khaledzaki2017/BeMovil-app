@@ -23,16 +23,20 @@ from .views import ValidatePhoneSendOTP
 router = routers.DefaultRouter()
 router.register('wizard', views.WizardFormViewSet, base_name='wizard')
 
-router.register('step1', views.Step1ViewSet)
-router.register('step2', views.Step2ViewSet)
-router.register('step3', views.Step3ViewSet)
+router.register('WizardList', views.WizardFormListView, base_name='WizardList')
+# router.register('step2', views.Step2ViewSet)
+# router.register('step3', views.Step3ViewSet)
 router.register('user-image', views.UserPicturesViewSet)
-
 app_name = 'multi_step_form'
 
 
 urlpatterns = [
     path('', include(router.urls)),
+    path('file/', views.FileView.as_view()),
+    path('filedetail/<int:pk>/', views.FileDetail.as_view()),
+    path('filelist/', views.FileViewlist.as_view()),
+
     path('validate_phone/', ValidatePhoneSendOTP.as_view()),
+
 
 ]

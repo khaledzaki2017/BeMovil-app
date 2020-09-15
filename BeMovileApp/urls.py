@@ -21,6 +21,7 @@ from django.conf.urls.static import static
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include('multi_step_form.urls')),
+
     # path('pdf/', include('pdf_results.urls')),
 ]
 

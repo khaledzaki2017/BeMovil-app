@@ -1,32 +1,101 @@
 from django.db import models
 from django.db.models.signals import pre_save
 import time
+import uuid
+
+from multiselectfield import MultiSelectField
+
+from django.conf import settings
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+from rest_framework.authtoken.models import Token
+
+
+from multiselectfield import MultiSelectField
+
+# @receiver(post_save, sender=settings.AUTH_USER_MODEL)
+# def create_auth_token(sender, instance=None, created=False, **kwargs):
+#     if created:
+#         Token.objects.create(user=instance)
+
 
 # Create your models here.
 
+# class Client(models.Model):
+#     bemovil_id = models.IntegerField(null=True, primary_key=True)
+#     email = models.EmailField(max_length=255, null=True)
+#     mobile_phone = models.IntegerField(null=True)
 
-class Step1FormModel(models.Model):
-    client_id = models.UUIDField(null=True)
-    firstname = models.CharField(max_length=100, null=True)
-    lastname = models.CharField(max_length=100, null=True)
+
+#     def __str__(self):
+#         return str(self.email)
+
+
+TERMS_CHOICES = (('term_key1', 'Terminos y condicions'),
+                 ('term_key2', 'Autorizacion para consulta y reporte'),
+                 ('term_key3', 'Tratamiento de datos personales'),
+                 ('term_key4', 'Autorizacion para el Tratamiento de datos personales'),
+                 ('term_key5', 'origen de fondos'))
+
+TYPE_CHOICES = ((1, 'Natural'),
+                (2, 'Juridica'))
+
+
+class WizardForm(models.Model):
+
+    id = models.UUIDField(
+        primary_key=True, null=False, unique=True, default=uuid.uuid4, editable=False)
+
+    _type = models.CharField(max_length=100, choices=TYPE_CHOICES)
+    personal_id = models.TextField(max_length=250, null=True)
+    firstname = models.CharField(max_length=250, null=True)
+    lastname = models.CharField(max_length=250, null=True)
     bemovil_id = models.IntegerField(null=True)
-    personal_id = models.TextField(max_length=100, null=True)
     expedition_date = models.DateField(null=True)
-    expedition_place = models.CharField(max_length=100, null=True)
+    expedition_place = models.CharField(max_length=250, null=True)
     mobile_phone = models.IntegerField(null=True)
     number = models.IntegerField(null=True)
     email = models.EmailField(max_length=255, null=True)
 
-    # address = models.TextField(max_length=100, null=True)
-    # city = models.CharField(max_length=100, null=True)
-    # valley = models.CharField(max_length=100, null=True)
-    # image1 = models.ImageField(upload_to='user_images/', null=True)
-    # image2 = models.ImageField(upload_to='user_images/', null=True)
-    # image3 = models.ImageField(upload_to='user_images/', null=True)
-    # created_at = models.DateTimeField(auto_now_add=True)
+    address = models.TextField(max_length=250, null=True)
+    city = models.CharField(max_length=250, null=True)
+    valley = models.CharField(max_length=250, null=True)
 
-    def __str__(self):
-        return str(self.firstname)
+    company_name = models.CharField(max_length=250, null=True)
+    actividad_economica = models.CharField(max_length=250, null=True)
+    direccion = models.TextField(max_length=250, null=True)
+    barrio = models.CharField(max_length=250, null=True)
+    ciudad = models.CharField(max_length=250, null=True)
+    departamento = models.CharField(max_length=250, null=True)
+
+    telefono_fijo = models.IntegerField(blank=True, null=True)
+    ingresos = models.IntegerField(blank=True, null=True)
+    total_activos = models.IntegerField(blank=True, null=True)
+    egresos = models.IntegerField(blank=True, null=True)
+    total_pasivos = models.IntegerField(blank=True, null=True)
+    name_razonsocial = models.TextField(max_length=250, null=True)
+    participacion = models.IntegerField(null=True)
+    identification = models.CharField(max_length=250, null=True)
+
+    term1 = models.BooleanField(default=False)
+    term2 = models.BooleanField(default=False)
+    term3 = models.BooleanField(default=False)
+    term4 = models.BooleanField(default=False)
+    term5 = models.BooleanField(default=False)
+
+    is_confirmed = models.BooleanField(default=False)
+
+    firstFile = models.FileField(upload_to='documents')
+    secondFile = models.FileField(upload_to='documents')
+    file = models.BinaryField(null=True, blank=False)
+
+    id_image1 = models.ImageField(upload_to='user_images/id_images', null=True)
+    id_image2 = models.ImageField(upload_to='user_images/id_images', null=True)
+
+    client_image1 = models.ImageField(upload_to='user_images/', null=True)
+    client_image2 = models.ImageField(upload_to='user_images/', null=True)
+    client_image3 = models.ImageField(upload_to='user_images/', null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
 
 
 class PhoneOTP(models.Model):
@@ -51,39 +120,84 @@ def add_timer(sender, instance, *args, **kwargs):
 
 pre_save.connect(add_timer, sender=PhoneOTP)
 
+# class Step1FormModel(models.Model):
 
-class Step2FormModel(models.Model):
-    address = models.TextField(max_length=100, null=True)
-    city = models.CharField(max_length=100, null=True)
-    valley = models.CharField(max_length=100, null=True)
+#     # client_id = models.ForeignKey(Client,on_delete=models.CASCADE)
+#     id = models.UUIDField(
+#         primary_key=True, null=False, unique=True, default=uuid.uuid4, editable=False)
+#     personal_id = models.TextField(max_length=250, null=True)
+#     firstname = models.CharField(max_length=250, null=True)
+#     lastname = models.CharField(max_length=250, null=True)
+#     bemovil_id = models.IntegerField(null=True)
+#     expedition_date = models.DateField(null=True)
+#     expedition_place = models.CharField(max_length=250, null=True)
+#     mobile_phone = models.IntegerField(null=True)
+#     number = models.IntegerField(null=True)
+#     email = models.EmailField(max_length=255, null=True)
 
-
-class Step3FormModel(models.Model):
-    mobile_phone = models.IntegerField(null=True)
-    number = models.IntegerField(null=True)
-
-
-class UserPictures(models.Model):
-    '''
-    Model to manage multiple pictures of the user
-    '''
-    #user_uuid = models.UUIDField(null=True)
-    name = models.CharField(max_length=200, null=True)
-    image1 = models.ImageField(upload_to='user_images/', null=True)
-    image2 = models.ImageField(upload_to='user_images/', null=True)
-    image3 = models.ImageField(upload_to='user_images/', null=True)
-
-    created_at = models.DateTimeField(auto_now_add=True)
-
-    def __str__(self):
-        return str(self.name)
+#     address = models.TextField(max_length=250, null=True)
+#     city = models.CharField(max_length=250, null=True)
+#     valley = models.CharField(max_length=250, null=True)
 
 
-class FileModel(models.Model):
-    uploader = models.CharField(max_length=20)
-    firstFile = models.FileField(upload_to='documents')
-    secondFile = models.FileField(upload_to='documents')
-    file = models.BinaryField(null=True, blank=False)
+#     def __str__(self):
+#         return str(self.firstname)
 
-    def __str__(self):
-        return self.uploader
+
+# class Step2FormModel(models.Model):
+#     # client_id = models.OneToOneField(
+#     #     Step1FormModel, null=True, on_delete=models.CASCADE)
+#     company_name = models.CharField(max_length=250, null=True)
+#     actividad_economica=models.CharField(max_length=250, null=True)
+#     direccion = models.TextField(max_length=250, null=True)
+#     barrio = models.CharField(max_length=250, null=True)
+#     ciudad = models.CharField(max_length=250, null=True)
+#     departamento = models.CharField(max_length=250, null=True)
+#     mobile_phone =models.IntegerField(blank=True, null=True)
+#     telefono_fijo =models.IntegerField(blank=True, null=True)
+#     email =models.EmailField(blank=True, null=True)
+#     ingresos =models.IntegerField(blank=True, null=True)
+#     total_activos =models.IntegerField(blank=True, null=True)
+#     egresos =models.IntegerField(blank=True, null=True)
+#     total_pasivos = models.IntegerField(blank=True, null=True)
+#     name_razonsocial = models.TextField(max_length=250, null=True)
+#     participacion = models.IntegerField(max_length=250, null=True)
+#     identification = models.CharField(max_length=250, null=True)
+#     number =models.IntegerField(max_length=250, null=True)
+#     address =models.CharField(max_length=250, null=True)
+#     city =models.CharField(max_length=250, null=True)
+
+
+# class Step3FormModel(models.Model):
+#     # client_id = models.OneToOneField(
+#     terms=models.c
+
+
+# class UserPictures(models.Model):
+#     '''
+#     Model to manage multiple pictures of the user
+#     '''
+#     #user_uuid = models.UUIDField(null=True)
+#     # client_id = models.OneToOneField(
+#     #     Step1FormModel, null=True, on_delete=models.CASCADE)
+#     name = models.CharField(max_length=200, null=True)
+#     image1 = models.ImageField(upload_to='user_images/', null=True)
+#     image2 = models.ImageField(upload_to='user_images/', null=True)
+#     image3 = models.ImageField(upload_to='user_images/', null=True)
+
+#     created_at = models.DateTimeField(auto_now_add=True)
+
+#     def __str__(self):
+#         return str(self.name)
+
+
+# class FileModel(models.Model):
+#     # client_id = models.one(
+#     #     Step1FormModel, null=True, on_delete=models.CASCADE)
+#     uploader = models.CharField(max_length=20)
+#     firstFile = models.FileField(upload_to='documents')
+#     secondFile = models.FileField(upload_to='documents')
+#     file = models.BinaryField(null=True, blank=False)
+
+#     def __str__(self):
+#         return self.uploader
