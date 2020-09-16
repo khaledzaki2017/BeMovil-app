@@ -10,8 +10,8 @@ class WizardFormSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = WizardForm
-        fields = '__all__'
-
+        fields = ('id', 'firstname', 'lastname',
+                  'email',)
         read_only_fields = ('id',)
 
 

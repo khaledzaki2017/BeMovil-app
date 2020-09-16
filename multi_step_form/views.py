@@ -25,8 +25,9 @@ from django.core.files.base import ContentFile
 from django.core.files.storage import default_storage
 from rest_framework.parsers import MultiPartParser, FormParser
 # from .models import FileModel
-
-
+from .utils import Util
+from django.contrib.sites.shortcuts import get_current_site
+from django.urls import reverse
 from django.contrib.auth.models import AnonymousUser
 
 from rest_framework.generics import (
@@ -124,8 +125,10 @@ class FileViewlist(APIView):
 class FileDetail(RetrieveAPIView):
     authentication_classes = (Authentication,)
 
-    queryset = WizardForm.objects.values("firstFile", "secondFile")
-    serializer_class = serializers.FileSerilizer
+    def get(self, request, pk=None):
+        queryset = WizardForm.objects.values("firstFile", "secondFile")
+        serializer_class = serializers.FileSerilizer()
+        return Response(serializer_class.data)
 
 # *************************FULL WIZARD DATA ********************************
 
@@ -156,6 +159,40 @@ class WizardFormListView(viewsets.ModelViewSet):
     queryset = WizardForm.objects.all()
     serializer_class = serializers.WizardFormSerializer
     filterset_class = TFilter
+
+    def create(self, request):
+        wizardData = request.data
+        serializer = self.serializer_class(data=wizardData)
+        if serializer.is_valid(raise_exception=True):
+            serializer.save()
+            wizard_data = serializer.data
+            print(wizard_data)
+            client_email = wizard_data['email']
+            print(client_email)
+            client_name = wizard_data['firstname']
+            print(client_name)
+            current_site = get_current_site(request).domain
+
+            relativeLink = reverse('multi_step_form:email-check')
+            absurl = 'http://' + current_site + relativeLink
+            email_body = "Hello,"+client_name + "check yor data in the file below\n" + absurl
+            print(email_body)
+            data = {'email_body': email_body, 'to_email': [client_email],
+                    'email_subject': 'check your data'}
+            print(data)
+            Util.send_email(data)
+
+            return Response(wizard_data,
+                            status=status.HTTP_201_CREATED)
+        else:
+            return Response(serializer.errors,
+                            status=status.HTTP_400_BAD_REQUEST)
+
+
+class EmailCheck(generics.GenericAPIView):
+    def get(self):
+        pass
+
 
 # class Step2ViewSet(viewsets.ModelViewSet):
 #     queryset = Step2FormModel.objects.all()
