@@ -39,6 +39,6 @@ urlpatterns = [
     path('validate_phone/', ValidatePhoneSendOTP.as_view()),
     path('email-check/', views.EmailCheck.as_view()),
     path('partner/', views.PartnerView.as_view()),
-
+    path('partnerlist/',views.PartnerMainWizardListAPIView.as_view()),
 
 ]

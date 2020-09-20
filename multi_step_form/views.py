@@ -6,8 +6,9 @@ from rest_framework.views import APIView
 from core.models import PhoneOTP, WizardForm, Partner
 from multi_step_form import serializers
 from drf_multiple_model.viewsets import ObjectMultipleModelAPIViewSet
-from .serializers import FileSerilizer, PartnerSerializer
+from .serializers import FileSerilizer, PartnerSerializer,PartnerWizardSerializer
 import os
+import django_filters
 from rest_framework import generics
 from rest_framework import status
 from rest_framework.views import APIView
@@ -139,7 +140,8 @@ class WizardFormViewSet(ObjectMultipleModelAPIViewSet):
         {'queryset': WizardForm.objects.all(
         ), 'serializer_class': serializers.WizardFormSerializer},
         {'queryset': PhoneOTP.objects.all(
-        ), 'serializer_class': serializers.PhoneOTPSerializer}
+        ), 'serializer_class': serializers.PhoneOTPSerializer},
+        {'queryset':Partner.objects.all(),'serializer_class':PartnerSerializer}
     ]
 
 # *********************************************************************
@@ -159,6 +161,8 @@ class WizardFormListView(viewsets.ModelViewSet):
     queryset = WizardForm.objects.all()
     serializer_class = serializers.WizardFormSerializer
     filterset_class = TFilter
+
+
 
     def create(self, request):
         wizardData = request.data
@@ -193,6 +197,33 @@ class EmailCheck(generics.GenericAPIView):
     def get(self):
         pass
 
+
+
+
+class PartnerMainWizardFilter(django_filters.FilterSet):
+    partner = django_filters.Filter(field_name="WizardForm__email")
+
+    class Meta:
+        model = Partner
+        fields = ['main']
+
+
+# class PartnerMainWizardListAPIView(ListAPIView):
+#
+#     serializer_class = PartnerWizardSerializer
+#
+#     def get_queryset(self):
+#         queryset = Partner.objects.all()
+#         main = self.request.query_params.get("main", None)
+#         print(main)
+#         if main is not None:
+#             queryset = queryset.filter(WizardForm__icontains=main)
+#         return queryset
+class PartnerMainWizardListAPIView(ListAPIView):
+
+    queryset = Partner.objects.all()
+    serializer_class = PartnerWizardSerializer
+    filter_class = PartnerMainWizardFilter
 
 class PartnerView(APIView):
     queryset = Partner.objects.all()

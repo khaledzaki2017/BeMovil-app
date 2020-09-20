@@ -87,3 +87,13 @@ class PartnerSerializer(serializers.ModelSerializer):
     class Meta:
         model = Partner
         fields = '__all__'
+class PartnerWizardSerializer(serializers.ModelSerializer):
+    def __init__(self, *args, **kwargs):
+        many = kwargs.pop('many', True)
+        super(PartnerWizardSerializer, self).__init__(many=many, *args, **kwargs)
+
+
+    # main= serializers.EmailField(source='wizardform.email')
+    class Meta:
+        model = Partner
+        fields ='__all__'
