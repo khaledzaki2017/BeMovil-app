@@ -10,7 +10,7 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from rest_framework.authtoken.models import Token
 
-
+# from sortedone2many.fields import SortedOneToManyField
 from multiselectfield import MultiSelectField
 
 # @receiver(post_save, sender=settings.AUTH_USER_MODEL)
@@ -88,6 +88,8 @@ class WizardForm(models.Model):
     client_image2 = models.ImageField(upload_to='user_images/', null=True)
     client_image3 = models.ImageField(upload_to='user_images/', null=True)
     created_at = models.DateTimeField(auto_now_add=True)
+
+    # partner=SortedOneToManyField(Item, sorted=True, blank=True)
 
 
 class PhoneOTP(models.Model):
