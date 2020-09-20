@@ -37,8 +37,8 @@ urlpatterns = [
     path('filelist/', views.FileViewlist.as_view()),
 
     path('validate_phone/', ValidatePhoneSendOTP.as_view()),
-    path('email-check/', views.EmailCheck.as_view(), name='email-check'),
-
+    path('email-check/', views.EmailCheck.as_view()),
+    path('partner/', views.PartnerView.as_view()),
 
 
 ]

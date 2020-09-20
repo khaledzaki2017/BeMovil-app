@@ -3,10 +3,10 @@ from rest_framework.response import Response
 from rest_framework import viewsets, status
 import random
 from rest_framework.views import APIView
-from core.models import PhoneOTP, WizardForm
+from core.models import PhoneOTP, WizardForm, Partner
 from multi_step_form import serializers
 from drf_multiple_model.viewsets import ObjectMultipleModelAPIViewSet
-
+from .serializers import FileSerilizer, PartnerSerializer
 import os
 from rest_framework import generics
 from rest_framework import status
@@ -94,7 +94,7 @@ def upload_handler(up_file, uploader):
 class FileView(APIView):
     authentication_classes = (Authentication,)
     parser_classes = (MultiPartParser, FormParser,)
-    queryset = WizardForm.objects.values("firstFile", "secondFile")
+    queryset = WizardForm.objects.values("firstFile", "secondFile", "uploader")
     serializer_class = serializers.FileSerilizer
 
     def post(self, request, *args, **kwargs):
@@ -192,6 +192,25 @@ class WizardFormListView(viewsets.ModelViewSet):
 class EmailCheck(generics.GenericAPIView):
     def get(self):
         pass
+
+
+class PartnerView(APIView):
+    queryset = Partner.objects.all()
+    serializer_class = serializers.PartnerSerializer
+
+    def post(self, request, *args, **kwargs):
+        print(request.data)
+        PartnerData = request.data
+        serializer = self.serializer_class(data=PartnerData)
+        if serializer.is_valid(raise_exception=True):
+            serializer.save()
+            # partner_data = serializer.data.filter(
+            #     email=self.request.data.main)
+            return Response(serializer.data,
+                            status=status.HTTP_201_CREATED)
+        else:
+            return Response(serializer.errors,
+                            status=status.HTTP_400_BAD_REQUEST)
 
 
 # class Step2ViewSet(viewsets.ModelViewSet):

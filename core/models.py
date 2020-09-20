@@ -43,9 +43,10 @@ TYPE_CHOICES = ((1, 'Natural'),
 
 class WizardForm(models.Model):
 
-    id = models.UUIDField(
-        primary_key=True, null=False, unique=True, default=uuid.uuid4, editable=False)
-
+    # id = models.UUIDField(
+    #     primary_key=True, null=False, unique=True, default=uuid.uuid4, editable=False)
+    email = models.EmailField(
+        primary_key=True, null=False, unique=True, default="")
     _type = models.CharField(max_length=100, choices=TYPE_CHOICES)
     personal_id = models.TextField(max_length=250, null=True)
     firstname = models.CharField(max_length=250, null=True)
@@ -55,7 +56,6 @@ class WizardForm(models.Model):
     expedition_place = models.CharField(max_length=250, null=True)
     mobile_phone = models.IntegerField(null=True)
     number = models.IntegerField(null=True)
-    email = models.EmailField(max_length=255, null=True)
 
     address = models.TextField(max_length=250, null=True)
     city = models.CharField(max_length=250, null=True)
@@ -73,18 +73,10 @@ class WizardForm(models.Model):
     total_activos = models.IntegerField(blank=True, null=True)
     egresos = models.IntegerField(blank=True, null=True)
     total_pasivos = models.IntegerField(blank=True, null=True)
-    name_razonsocial = models.TextField(max_length=250, null=True)
-    participacion = models.IntegerField(null=True)
-    identification = models.CharField(max_length=250, null=True)
-
-    term1 = models.BooleanField(default=False)
-    term2 = models.BooleanField(default=False)
-    term3 = models.BooleanField(default=False)
-    term4 = models.BooleanField(default=False)
-    term5 = models.BooleanField(default=False)
 
     is_confirmed = models.BooleanField(default=False)
 
+    uploader = models.CharField(max_length=250, null=True)
     firstFile = models.FileField(upload_to='documents')
     secondFile = models.FileField(upload_to='documents')
     file = models.BinaryField(null=True, blank=False)
@@ -201,3 +193,12 @@ pre_save.connect(add_timer, sender=PhoneOTP)
 
 #     def __str__(self):
 #         return self.uploader
+
+class Partner(models.Model):
+    main = models.ForeignKey(WizardForm, on_delete=models.CASCADE)
+    name_razonsocial = models.TextField(max_length=250, null=True)
+    participacion = models.IntegerField(null=True)
+    identification = models.CharField(max_length=250, null=True)
+    number = models.IntegerField(null=True)
+    ciudad = models.CharField(max_length=250, null=True)
+    direccion = models.CharField(max_length=250, null=True)

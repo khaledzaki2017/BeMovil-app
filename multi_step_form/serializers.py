@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from core.models import WizardForm, PhoneOTP
+from core.models import WizardForm, PhoneOTP, Partner
 # from core.models import PhoneOTP, Step1FormModel, Step2FormModel, Step3FormModel, UserPictures, FileModel
 
 
@@ -76,4 +76,14 @@ class FileSerilizer(serializers.ModelSerializer):
 
     class Meta:
         model = WizardForm
-        fields = ('id', 'firstFile', 'secondFile', 'created_at')
+        fields = ('id', 'firstFile', 'secondFile', 'uploader')
+
+
+class PartnerSerializer(serializers.ModelSerializer):
+    def __init__(self, *args, **kwargs):
+        many = kwargs.pop('many', True)
+        super(PartnerSerializer, self).__init__(many=many, *args, **kwargs)
+
+    class Meta:
+        model = Partner
+        fields = '__all__'
