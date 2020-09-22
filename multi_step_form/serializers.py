@@ -64,9 +64,9 @@ class FormImageSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = WizardForm
-        fields = ('id', 'id_image1', 'id_image2', 'client_image1',
+        fields = ('id_image1', 'id_image2', 'client_image1',
                   'client_image2', 'client_image3')
-        read_only_fields = ('id',)
+        # read_only_fields = ('id',)
 
 
 class FileSerilizer(serializers.ModelSerializer):

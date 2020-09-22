@@ -18,8 +18,8 @@ from rest_framework.decorators import action
 
 from rest_framework.response import Response
 from django.http.response import HttpResponseRedirect
-from drf_pdf.renderer import PDFRenderer
-from drf_pdf.response import PDFResponse
+# from drf_pdf.renderer import PDFRenderer
+# from drf_pdf.response import PDFResponse
 from io import BytesIO
 from base64 import b64encode, b64decode
 from django.core.files.base import ContentFile
