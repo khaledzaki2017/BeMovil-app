@@ -76,7 +76,7 @@ class FileSerilizer(serializers.ModelSerializer):
 
     class Meta:
         model = WizardForm
-        fields = ('id', 'firstFile', 'secondFile', 'uploader')
+        fields = ( 'firstFile', 'secondFile', 'uploader')
 
 
 class PartnerSerializer(serializers.ModelSerializer):
