@@ -328,6 +328,8 @@ class ValidatePhoneSendOTP(APIView):
                 if old.exists():
                     old = old.first()
                     count = old.count
+                    if count is None:
+                        count = 1
                     if count > 10:
                         return Response({'status': False, 'detail': 'sending OTP limit exceeded'})
                     else:
