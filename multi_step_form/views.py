@@ -114,6 +114,12 @@ class FileView(APIView):
         else:
             return Response(file_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+    def get(self, request, pk=None):
+        queryset = WizardForm.objects.values(
+            "firstFile", "secondFile", "uploader")
+        serializer_class = serializers.FileSerilizer()
+        return Response(serializer_class.data)
+
 
 class FileViewlist(APIView):
     authentication_classes = (Authentication,)
@@ -346,8 +352,9 @@ class ValidatePhoneSendOTP(APIView):
 
 def send_otp(phone):
     if phone:
-        key = random.randint(999, 9999)
-        print(key)
+        key = '{0:06}'.format(random.randint(1, 100000))
+
+        print("OTP key generated", key)
         return key
     else:
         return False
