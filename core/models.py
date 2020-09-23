@@ -31,12 +31,6 @@ from multiselectfield import MultiSelectField
 #         return str(self.email)
 
 
-TERMS_CHOICES = (('term_key1', 'Terminos y condicions'),
-                 ('term_key2', 'Autorizacion para consulta y reporte'),
-                 ('term_key3', 'Tratamiento de datos personales'),
-                 ('term_key4', 'Autorizacion para el Tratamiento de datos personales'),
-                 ('term_key5', 'origen de fondos'))
-
 TYPE_CHOICES = ((1, 'Natural'),
                 (2, 'Juridica'))
 
@@ -67,7 +61,7 @@ class WizardForm(models.Model):
     barrio = models.CharField(max_length=250, null=True)
     ciudad = models.CharField(max_length=250, null=True)
     departamento = models.CharField(max_length=250, null=True)
-    mobile_phone_fin=models.IntegerField(null=True)
+    mobile_phone_fin = models.IntegerField(null=True)
     email_fin = models.EmailField(null=True, unique=True, default="")
 
     telefono_fijo = models.IntegerField(blank=True, null=True)
@@ -75,7 +69,6 @@ class WizardForm(models.Model):
     total_activos = models.IntegerField(blank=True, null=True)
     egresos = models.IntegerField(blank=True, null=True)
     total_pasivos = models.IntegerField(blank=True, null=True)
-
 
     uploader = models.CharField(max_length=250, null=True)
     firstFile = models.FileField(upload_to='documents')
@@ -90,7 +83,8 @@ class WizardForm(models.Model):
     client_image3 = models.ImageField(upload_to='user_images/', null=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
-    # partner=SortedOneToManyField(Item, sorted=True, blank=True)
+    def __str__(self):
+        return f'This is {self.firstname} {self.lastname} Form'
 
 
 class PhoneOTP(models.Model):
@@ -114,6 +108,20 @@ def add_timer(sender, instance, *args, **kwargs):
 
 
 pre_save.connect(add_timer, sender=PhoneOTP)
+
+
+class Partner(models.Model):
+    main = models.ForeignKey(WizardForm, on_delete=models.CASCADE)
+    name_razonsocial = models.TextField(max_length=250, null=True)
+    participacion = models.IntegerField(null=True)
+    identification = models.CharField(max_length=250, null=True)
+    number = models.IntegerField(null=True)
+    ciudad = models.CharField(max_length=250, null=True)
+    direccion = models.CharField(max_length=250, null=True)
+
+    def __str__(self):
+        return f'{self.name_razonsocial} is partner to {self.main}'
+
 
 # class Step1FormModel(models.Model):
 
@@ -196,12 +204,3 @@ pre_save.connect(add_timer, sender=PhoneOTP)
 
 #     def __str__(self):
 #         return self.uploader
-
-class Partner(models.Model):
-    main = models.ForeignKey(WizardForm, on_delete=models.CASCADE)
-    name_razonsocial = models.TextField(max_length=250, null=True)
-    participacion = models.IntegerField(null=True)
-    identification = models.CharField(max_length=250, null=True)
-    number = models.IntegerField(null=True)
-    ciudad = models.CharField(max_length=250, null=True)
-    direccion = models.CharField(max_length=250, null=True)

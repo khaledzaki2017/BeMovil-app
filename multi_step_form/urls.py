@@ -1,19 +1,4 @@
-# from django.urls import path
 
-# #from multi_step_form.views import FormStep1, FormStep2, FormStep3
-# from multi_step_form.views import Form_list
-# from multi_step_form import views
-# from rest_framework.routers import DefaultRouter
-
-# app_name = 'multi_step_form'
-
-# urlpatterns = [
-#     path('api/', views.Form_list),
-
-#     # path('', FormStep1.as_view(), name='step_1'),
-#     # path('step-2', FormStep2.as_view(), name='step_2'),
-#     # path('step-3', FormStep3.as_view(), name='step_3'),
-# ]
 from django.urls import path, include
 from rest_framework import routers
 
@@ -24,8 +9,7 @@ router = routers.DefaultRouter()
 router.register('wizard', views.WizardFormViewSet, base_name='wizard')
 
 router.register('wizardlist', views.WizardFormListView, base_name='wizardlist')
-# router.register('step2', views.Step2ViewSet)
-# router.register('step3', views.Step3ViewSet)
+
 router.register('user-image', views.UserPicturesViewSet)
 app_name = 'multi_step_form'
 

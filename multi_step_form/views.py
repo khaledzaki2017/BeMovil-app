@@ -1,160 +1,38 @@
-from rest_framework.decorators import action
-from rest_framework.response import Response
-from rest_framework import viewsets, status
 import random
-from rest_framework.views import APIView
 from core.models import PhoneOTP, WizardForm, Partner
 from multi_step_form import serializers
 from drf_multiple_model.viewsets import ObjectMultipleModelAPIViewSet
 from .serializers import FileSerilizer, PartnerSerializer, PartnerWizardSerializer
 import os
 import django_filters
-from rest_framework import generics
-from rest_framework import status
-from rest_framework.views import APIView
-from rest_framework.viewsets import ViewSet
-from rest_framework import viewsets, status
-from rest_framework.decorators import action
-
-from rest_framework.response import Response
-from django.http.response import HttpResponseRedirect
-# from drf_pdf.renderer import PDFRenderer
-# from drf_pdf.response import PDFResponse
-from io import BytesIO
-from base64 import b64encode, b64decode
-from django.core.files.base import ContentFile
-from django.core.files.storage import default_storage
-from rest_framework.parsers import MultiPartParser, FormParser
-# from .models import FileModel
 from .utils import Util
 from django.contrib.sites.shortcuts import get_current_site
 from django.urls import reverse
 from django.contrib.auth.models import AnonymousUser
+from django_filters import rest_framework as filters
+from django.http import HttpResponse
+from django.core.files.storage import default_storage
 
+# ******************Rest_Framework Imports******************************
+from rest_framework import generics
+from rest_framework.views import APIView
+from rest_framework.viewsets import ViewSet
+from rest_framework import authentication
+from rest_framework import exceptions
+from rest_framework.authtoken.models import Token
 from rest_framework.generics import (
     ListAPIView, CreateAPIView, RetrieveUpdateAPIView,
     RetrieveAPIView, DestroyAPIView
 )
 from rest_framework.authentication import TokenAuthentication
-
-from django_filters import rest_framework as filters
-from django.http import HttpResponse
-
-
-# class JSONWebTokenAuthentication(TokenAuthentication):
-#     def authenticate_credentials(self, jwtToken):
-#         try:
-#             payload = jwt.decode(jwtToken, secret_key, verify=True)
-#             # user = User.objects.get(username='root')
-#             user = AnonymousUser()
-#         except (jwt.DecodeError, User.DoesNotExist):
-#             raise exceptions.AuthenticationFailed('Invalid token)
-#         except jwt.ExpiredSignatureError:
-#             raise exceptions.AuthenticationFailed('Token has expired')
-#         return (user, payload)
+from rest_framework.decorators import action
+from rest_framework.response import Response
+from rest_framework import viewsets, status
+from rest_framework.views import APIView
+from rest_framework.parsers import MultiPartParser, FormParser
 
 
-from rest_framework import authentication
-from rest_framework import exceptions
-from rest_framework.authtoken.models import Token
-
-
-class Authentication(authentication.BaseAuthentication):
-    def authenticate(self, request):
-        auth = authentication.get_authorization_header(request)
-        print("here", auth)
-        if not auth or auth[0].lower() != b'token':
-            return None
-
-        if len(auth) == 1:
-            msg = _('Invalid token header. No credentials provided.')
-            raise exceptions.AuthenticationFailed(msg)
-        elif len(auth) > 2:
-            msg = _(
-                'Invalid token header. Credentials string should not contain spaces.')
-            raise exceptions.AuthenticationFailed(msg)
-
-        try:
-            token = Token.objects.get(token=auth[1])
-            print(token.key)
-
-        except Token.DoesNotExist:
-            raise exceptions.AuthenticationFailed('No such token')
-
-        return (AnonymousUser(), token)
-
-
-# ********************FILE VIEWS******************************
-
-def upload_handler(up_file, uploader):
-    for f in up_file:
-        dest = f'uploaded_files/{uploader}'
-        if not os.path.exists(dest):
-            os.makedirs(dest)
-        default_storage.save(f'{dest}/{f}', ContentFile(f.read()))
-
-
-class FileView(APIView):
-    authentication_classes = (Authentication,)
-    parser_classes = (MultiPartParser, FormParser,)
-    queryset = WizardForm.objects.values("firstFile", "secondFile", "uploader")
-    serializer_class = serializers.FileSerilizer
-
-    def post(self, request, *args, **kwargs):
-        firstUploaded_files = request.FILES.getlist('firstFile')
-        secondUploaded_files = request.FILES.getlist('secondFile')
-
-        uploader = dict(request.data)['uploader'][0]
-        upload_handler(firstUploaded_files, uploader)
-        upload_handler(secondUploaded_files, uploader)
-        file_serializer = FileSerilizer(data=request.data)
-        if file_serializer.is_valid():
-            file_serializer.save()
-            return Response(file_serializer.data, status=status.HTTP_201_CREATED)
-        else:
-            return Response(file_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-    def get(self, request, pk=None):
-        queryset = WizardForm.objects.values(
-            "firstFile", "secondFile", "uploader")
-        serializer_class = serializers.FileSerilizer()
-        return Response(serializer_class.data)
-
-
-class FileViewlist(APIView):
-    authentication_classes = (Authentication,)
-
-    def get(self, request):
-        queryset = WizardForm.objects.values("firstFile", "secondFile")
-        serializer = serializers.FileSerilizer(queryset, many=True)
-
-        return Response(serializer.data)
-
-
-class FileDetail(RetrieveAPIView):
-    authentication_classes = (Authentication,)
-
-    def get(self, request, pk=None):
-        queryset = WizardForm.objects.values("firstFile", "secondFile")
-        serializer_class = serializers.FileSerilizer()
-        return Response(serializer_class.data)
-
-# *************************FULL WIZARD DATA ********************************
-
-
-class WizardFormViewSet(ObjectMultipleModelAPIViewSet):
-
-    querylist = [
-        {'queryset': WizardForm.objects.all(
-        ), 'serializer_class': serializers.WizardFormSerializer},
-        {'queryset': PhoneOTP.objects.all(
-        ), 'serializer_class': serializers.PhoneOTPSerializer},
-        {'queryset': Partner.objects.all(), 'serializer_class': PartnerSerializer}
-    ]
-
-# *********************************************************************
-
-
+# **************************************************************************************
 class TFilter(filters.FilterSet):
 
     class Meta:
@@ -206,65 +84,6 @@ class EmailCheck(generics.GenericAPIView):
         return response
 
 
-class PartnerMainWizardFilter(django_filters.FilterSet):
-    partner = django_filters.Filter(field_name="WizardForm__email")
-
-    class Meta:
-        model = Partner
-        fields = ['main']
-
-
-# class PartnerMainWizardListAPIView(ListAPIView):
-#
-#     serializer_class = PartnerWizardSerializer
-#
-#     def get_queryset(self):
-#         queryset = Partner.objects.all()
-#         main = self.request.query_params.get("main", None)
-#         print(main)
-#         if main is not None:
-#             queryset = queryset.filter(WizardForm__icontains=main)
-#         return queryset
-class PartnerMainWizardListAPIView(ListAPIView):
-
-    queryset = Partner.objects.all()
-    serializer_class = PartnerWizardSerializer
-    filter_class = PartnerMainWizardFilter
-
-
-class PartnerView(APIView):
-    queryset = Partner.objects.all()
-    serializer_class = serializers.PartnerSerializer
-
-    def post(self, request, *args, **kwargs):
-        print(request.data)
-        PartnerData = request.data
-        serializer = self.serializer_class(data=PartnerData)
-        if serializer.is_valid(raise_exception=True):
-            serializer.save()
-            # partner_data = serializer.data.filter(
-            #     email=self.request.data.main)
-            return Response(serializer.data,
-                            status=status.HTTP_201_CREATED)
-        else:
-            return Response(serializer.errors,
-                            status=status.HTTP_400_BAD_REQUEST)
-
-    def get(self, request, pk=None):
-        queryset = Partner.objects.all()
-        serializer_class = serializers.PartnerSerializer()
-        return Response(serializer_class.data)
-
-
-# class Step2ViewSet(viewsets.ModelViewSet):
-#     queryset = Step2FormModel.objects.all()
-#     serializer_class = serializers.Step2FormSerializer
-
-
-# class Step3ViewSet(viewsets.ModelViewSet):
-#     queryset = Step3FormModel.objects.all()
-#     serializer_class = serializers.Step3FormSerializer
-
 # ********************USER IMAGES VIEW**************
 
 
@@ -293,22 +112,8 @@ class UserPicturesViewSet(viewsets.ModelViewSet):
             status=status.HTTP_400_BAD_REQUEST
         )
 
-
-# class Step1ViewSet(viewsets.ModelViewSet):
-#     queryset = Step1FormModel.objects.all()
-#     serializer_class = serializers.Step1FormSerializer
-
-#    def getInitialdata(self, request, *args, **kwargs):
-#        sk = request.GET.get('sk', '')
-#        data = request.get_serializer
-#        if data:
-#           s = SessionStore(session_key=sk)
-#           s.delete()
-#             return Response({'result': data})
-#        return Response({'result': 'no data'})
-
-
 # **********************OTP VALIDATION*******************************
+
 
 class ValidatePhoneSendOTP(APIView):
     queryset = PhoneOTP.objects.all()
@@ -355,8 +160,194 @@ class ValidatePhoneSendOTP(APIView):
 def send_otp(phone):
     if phone:
         key = '{0:06}'.format(random.randint(1, 100000))
-
         print("OTP key generated", key)
         return key
     else:
         return False
+
+
+# class JSONWebTokenAuthentication(TokenAuthentication):
+#     def authenticate_credentials(self, jwtToken):
+#         try:
+#             payload = jwt.decode(jwtToken, secret_key, verify=True)
+#             # user = User.objects.get(username='root')
+#             user = AnonymousUser()
+#         except (jwt.DecodeError, User.DoesNotExist):
+#             raise exceptions.AuthenticationFailed('Invalid token)
+#         except jwt.ExpiredSignatureError:
+#             raise exceptions.AuthenticationFailed('Token has expired')
+#         return (user, payload)
+
+
+# class Authentication(authentication.BaseAuthentication):
+#     def authenticate(self, request):
+#         auth = authentication.get_authorization_header(request)
+#         print("here", auth)
+#         if not auth or auth[0].lower() != b'token':
+#             return None
+
+#         if len(auth) == 1:
+#             msg = _('Invalid token header. No credentials provided.')
+#             raise exceptions.AuthenticationFailed(msg)
+#         elif len(auth) > 2:
+#             msg = _(
+#                 'Invalid token header. Credentials string should not contain spaces.')
+#             raise exceptions.AuthenticationFailed(msg)
+
+#         try:
+#             token = Token.objects.get(token=auth[1])
+#             print(token.key)
+
+#         except Token.DoesNotExist:
+#             raise exceptions.AuthenticationFailed('No such token')
+
+#         return (AnonymousUser(), token)
+
+
+# ********************FILE VIEWS******************************
+
+def upload_handler(up_file, uploader):
+    for f in up_file:
+        dest = f'uploaded_files/{uploader}'
+        if not os.path.exists(dest):
+            os.makedirs(dest)
+        default_storage.save(f'{dest}/{f}', ContentFile(f.read()))
+
+
+class FileView(APIView):
+    # authentication_classes = (Authentication,)
+    parser_classes = (MultiPartParser, FormParser,)
+    queryset = WizardForm.objects.values("firstFile", "secondFile", "uploader")
+    serializer_class = serializers.FileSerilizer
+
+    def post(self, request, *args, **kwargs):
+        firstUploaded_files = request.FILES.getlist('firstFile')
+        secondUploaded_files = request.FILES.getlist('secondFile')
+
+        uploader = dict(request.data)['uploader'][0]
+        upload_handler(firstUploaded_files, uploader)
+        upload_handler(secondUploaded_files, uploader)
+        file_serializer = FileSerilizer(data=request.data)
+        if file_serializer.is_valid():
+            file_serializer.save()
+            return Response(file_serializer.data, status=status.HTTP_201_CREATED)
+        else:
+            return Response(file_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def get(self, request, pk=None):
+        queryset = WizardForm.objects.values(
+            "firstFile", "secondFile", "uploader")
+        serializer_class = serializers.FileSerilizer()
+        return Response(serializer_class.data)
+
+
+class FileViewlist(APIView):
+    # authentication_classes = (Authentication,)
+
+    def get(self, request):
+        queryset = WizardForm.objects.values("firstFile", "secondFile")
+        serializer = serializers.FileSerilizer(queryset, many=True)
+
+        return Response(serializer.data)
+
+
+class FileDetail(RetrieveAPIView):
+    # authentication_classes = (Authentication,)
+
+    def get(self, request, pk=None):
+        queryset = WizardForm.objects.values("firstFile", "secondFile")
+        serializer_class = serializers.FileSerilizer()
+        return Response(serializer_class.data)
+
+# *************************FULL WIZARD DATA ********************************
+
+
+class WizardFormViewSet(ObjectMultipleModelAPIViewSet):
+
+    querylist = [
+        {'queryset': WizardForm.objects.all(
+        ), 'serializer_class': serializers.WizardFormSerializer},
+        {'queryset': PhoneOTP.objects.all(
+        ), 'serializer_class': serializers.PhoneOTPSerializer},
+        {'queryset': Partner.objects.all(), 'serializer_class': PartnerSerializer}
+    ]
+
+# *********************************************************************
+
+
+class PartnerMainWizardFilter(django_filters.FilterSet):
+    partner = django_filters.Filter(field_name="WizardForm__email")
+
+    class Meta:
+        model = Partner
+        fields = ['main']
+
+
+# class PartnerMainWizardListAPIView(ListAPIView):
+#
+#     serializer_class = PartnerWizardSerializer
+#
+#     def get_queryset(self):
+#         queryset = Partner.objects.all()
+#         main = self.request.query_params.get("main", None)
+#         print(main)
+#         if main is not None:
+#             queryset = queryset.filter(WizardForm__icontains=main)
+#         return queryset
+#
+
+class PartnerMainWizardListAPIView(ListAPIView):
+
+    queryset = Partner.objects.all()
+    serializer_class = PartnerWizardSerializer
+    filter_class = PartnerMainWizardFilter
+
+
+class PartnerView(APIView):
+    queryset = Partner.objects.all()
+    serializer_class = serializers.PartnerSerializer
+
+    def post(self, request, *args, **kwargs):
+        print(request.data)
+        PartnerData = request.data
+        serializer = self.serializer_class(data=PartnerData)
+        if serializer.is_valid(raise_exception=True):
+            serializer.save()
+            # partner_data = serializer.data.filter(
+            #     email=self.request.data.main)
+            return Response(serializer.data,
+                            status=status.HTTP_201_CREATED)
+        else:
+            return Response(serializer.errors,
+                            status=status.HTTP_400_BAD_REQUEST)
+
+    def get(self, request, pk=None):
+        queryset = Partner.objects.all()
+        serializer_class = serializers.PartnerSerializer()
+        return Response(serializer_class.data)
+
+
+# ********************************************************************************************************
+# ********************************************************************************************************
+
+# class Step1ViewSet(viewsets.ModelViewSet):
+#     queryset = Step1FormModel.objects.all()
+#     serializer_class = serializers.Step1FormSerializer
+
+#    def getInitialdata(self, request, *args, **kwargs):
+#        sk = request.GET.get('sk', '')
+#        data = request.get_serializer
+#        if data:
+#           s = SessionStore(session_key=sk)
+#           s.delete()
+#             return Response({'result': data})
+#        return Response({'result': 'no data'})
+
+# class Step2ViewSet(viewsets.ModelViewSet):
+#     queryset = Step2FormModel.objects.all()
+#     serializer_class = serializers.Step2FormSerializer
+
+
+# class Step3ViewSet(viewsets.ModelViewSet):
+#     queryset = Step3FormModel.objects.all()
+#     serializer_class = serializers.Step3FormSerializer
