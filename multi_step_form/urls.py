@@ -23,7 +23,7 @@ from .views import ValidatePhoneSendOTP
 router = routers.DefaultRouter()
 router.register('wizard', views.WizardFormViewSet, base_name='wizard')
 
-router.register('WizardList', views.WizardFormListView, base_name='WizardList')
+router.register('wizardlist', views.WizardFormListView, base_name='wizardlist')
 # router.register('step2', views.Step2ViewSet)
 # router.register('step3', views.Step3ViewSet)
 router.register('user-image', views.UserPicturesViewSet)
@@ -39,6 +39,6 @@ urlpatterns = [
     path('validate_phone/', ValidatePhoneSendOTP.as_view()),
     path('email-check/', views.EmailCheck.as_view()),
     path('partner/', views.PartnerView.as_view()),
-    path('partnerlist/',views.PartnerMainWizardListAPIView.as_view()),
+    path('partnerlist/', views.PartnerMainWizardListAPIView.as_view()),
 
 ]

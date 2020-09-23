@@ -38,6 +38,8 @@ from rest_framework.generics import (
 from rest_framework.authentication import TokenAuthentication
 
 from django_filters import rest_framework as filters
+from django.http import HttpResponse
+
 
 # class JSONWebTokenAuthentication(TokenAuthentication):
 #     def authenticate_credentials(self, jwtToken):
@@ -168,21 +170,21 @@ class WizardFormListView(viewsets.ModelViewSet):
         if serializer.is_valid(raise_exception=True):
             serializer.save()
             wizard_data = serializer.data
-            # print(wizard_data)
-            # client_email = wizard_data['email']
-            # print(client_email)
-            # client_name = wizard_data['firstname']
-            # print(client_name)
-            # current_site = get_current_site(request).domain
-            #
-            # relativeLink = reverse('multi_step_form:email-check')
-            # absurl = 'http://' + current_site + relativeLink
-            # email_body = "Hello,"+client_name + "check yor data in the file below\n" + absurl
-            # print(email_body)
-            # data = {'email_body': email_body, 'to_email': [client_email],
-            #         'email_subject': 'check your data'}
-            # print(data)
-            # Util.send_email(data)
+            print(wizard_data)
+            client_email = wizard_data['email']
+            print(client_email)
+            client_name = wizard_data['firstname']
+            print(client_name)
+            current_site = get_current_site(request).domain
+
+            relativeLink = reverse('multi_step_form:email-check')
+            absurl = 'http://' + current_site + relativeLink
+            email_body = "Hello,"+client_name + "check yor data in the file below\n" + absurl
+            print(email_body)
+            data = {'email_body': email_body, 'to_email': [client_email],
+                    'email_subject': 'check your data'}
+            print(data)
+            Util.send_email(data)
 
             return Response(wizard_data,
                             status=status.HTTP_201_CREATED)
@@ -192,8 +194,10 @@ class WizardFormListView(viewsets.ModelViewSet):
 
 
 class EmailCheck(generics.GenericAPIView):
-    def get(self):
-        pass
+    def get(self, request):
+        response = HttpResponse(
+            "Please Check your Mailbox to verify your Email.")
+        return response
 
 
 class PartnerMainWizardFilter(django_filters.FilterSet):
