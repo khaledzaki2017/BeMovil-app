@@ -6,7 +6,7 @@ from rest_framework.views import APIView
 from core.models import PhoneOTP, WizardForm, Partner
 from multi_step_form import serializers
 from drf_multiple_model.viewsets import ObjectMultipleModelAPIViewSet
-from .serializers import FileSerilizer, PartnerSerializer,PartnerWizardSerializer
+from .serializers import FileSerilizer, PartnerSerializer, PartnerWizardSerializer
 import os
 import django_filters
 from rest_framework import generics
@@ -141,7 +141,7 @@ class WizardFormViewSet(ObjectMultipleModelAPIViewSet):
         ), 'serializer_class': serializers.WizardFormSerializer},
         {'queryset': PhoneOTP.objects.all(
         ), 'serializer_class': serializers.PhoneOTPSerializer},
-        {'queryset':Partner.objects.all(),'serializer_class':PartnerSerializer}
+        {'queryset': Partner.objects.all(), 'serializer_class': PartnerSerializer}
     ]
 
 # *********************************************************************
@@ -161,8 +161,6 @@ class WizardFormListView(viewsets.ModelViewSet):
     queryset = WizardForm.objects.all()
     serializer_class = serializers.WizardFormSerializer
     filterset_class = TFilter
-
-
 
     def create(self, request):
         wizardData = request.data
@@ -198,8 +196,6 @@ class EmailCheck(generics.GenericAPIView):
         pass
 
 
-
-
 class PartnerMainWizardFilter(django_filters.FilterSet):
     partner = django_filters.Filter(field_name="WizardForm__email")
 
@@ -225,6 +221,7 @@ class PartnerMainWizardListAPIView(ListAPIView):
     serializer_class = PartnerWizardSerializer
     filter_class = PartnerMainWizardFilter
 
+
 class PartnerView(APIView):
     queryset = Partner.objects.all()
     serializer_class = serializers.PartnerSerializer
@@ -242,6 +239,11 @@ class PartnerView(APIView):
         else:
             return Response(serializer.errors,
                             status=status.HTTP_400_BAD_REQUEST)
+
+    def get(self, request, pk=None):
+        queryset = Partner.objects.all()
+        serializer_class = serializers.PartnerSerializer()
+        return Response(serializer_class.data)
 
 
 # class Step2ViewSet(viewsets.ModelViewSet):
