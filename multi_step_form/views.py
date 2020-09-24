@@ -1,5 +1,10 @@
+import base64
+from core.models import phoneModel
+import pyotp
+from django.core.exceptions import ObjectDoesNotExist
+from datetime import datetime
 import random
-from core.models import PhoneOTP, WizardForm, Partner
+from core.models import WizardForm, Partner
 from multi_step_form import serializers
 from drf_multiple_model.viewsets import ObjectMultipleModelAPIViewSet
 from .serializers import FileSerilizer, PartnerSerializer, PartnerWizardSerializer
@@ -95,9 +100,9 @@ class UserPicturesViewSet(viewsets.ModelViewSet):
     @action(methods=['POST'], detail=True)
     def upload_image(self, request, pk=None):
         """Upload an image """
-        form = self.get_object()
+        img = self.get_object()
         serializer = self.get_serializer(
-            form,
+            img,
             data=request.data)
 
         if serializer.is_valid():
@@ -112,71 +117,58 @@ class UserPicturesViewSet(viewsets.ModelViewSet):
             status=status.HTTP_400_BAD_REQUEST
         )
 
+
 # **********************OTP VALIDATION*******************************
 
 
-class ValidatePhoneSendOTP(APIView):
-    queryset = PhoneOTP.objects.all()
-    serializer_class = serializers.PhoneOTPSerializer
-
-    def post(self, request, *args, **kwargs):
-        phone_num = request.data.get('phone')
-        if phone_num:
-            phone = str(phone_num)
-            # user = User.objects.filter(phone__iexact=phone)
-            # if user.exists():
-            #     return Response({'status': False, 'detail': 'phone number already exist'})
-            # else:
-            key = send_otp(phone)
-            if key:
-                old = PhoneOTP.objects.filter(phone__iexact=phone)
-                if old.exists():
-                    old = old.first()
-                    count = old.count
-                    if count is None:
-                        count = 1
-                    if count > 10:
-                        return Response({'status': False, 'detail': 'sending OTP limit exceeded'})
-                    else:
-                        old.count = count + 1
-                        old.save()
-                        return Response({'status': True, 'detail': 'OTP sended successfully'})
-
-                else:
-
-                    PhoneOTP.objects.create(
-                        phone=phone,
-                        otp=key
-                    )
-                    return Response({'status': True, 'detail': 'OTP sended successfully'})
-
-            else:
-                return Response({'status': False, 'detail': 'sending otp has error'})
-
-        else:
-            return Response({'status': False, 'detail': 'phone number is not givin in the request'})
+# This class returns the string needed to generate the key
+class generateKey:
+    @staticmethod
+    def returnValue(phone):
+        return str(phone) + str(datetime.date(datetime.now())) + "Some Random Secret Key"
 
 
-def send_otp(phone):
-    if phone:
-        key = '{0:06}'.format(random.randint(1, 100000))
-        print("OTP key generated", key)
-        return key
-    else:
-        return False
+class getPhoneNumberRegistered(APIView):
+    # Get to Create a call for OTP
+    @staticmethod
+    def get(request, phone):
+        try:
+            # if Mobile already exists the take this else create New One
+            Mobile = phoneModel.objects.get(Mobile=phone)
+        except ObjectDoesNotExist:
+            phoneModel.objects.create(
+                Mobile=phone,
+            )
+            Mobile = phoneModel.objects.get(
+                Mobile=phone)  # user Newly created Model
+        Mobile.counter += 1  # Update Counter At every Call
+        Mobile.save()  # Save the data
+        keygen = generateKey()
+        key = base64.b32encode(keygen.returnValue(
+            phone).encode())  # Key is generated
+        OTP = pyotp.HOTP(key)  # HOTP Model for OTP is created
+        print(OTP.at(Mobile.counter))
+        # Using Multi-Threading send the OTP Using Messaging Services like Twilio or Fast2sms
+        # Just for demonstration
+        return Response({"OTP": OTP.at(Mobile.counter)}, status=200)
 
+    # This Method verifies the OTP
+    @staticmethod
+    def post(request, phone):
+        try:
+            Mobile = phoneModel.objects.get(Mobile=phone)
+        except ObjectDoesNotExist:
+            return Response("User does not exist", status=404)  # False Call
 
-# class JSONWebTokenAuthentication(TokenAuthentication):
-#     def authenticate_credentials(self, jwtToken):
-#         try:
-#             payload = jwt.decode(jwtToken, secret_key, verify=True)
-#             # user = User.objects.get(username='root')
-#             user = AnonymousUser()
-#         except (jwt.DecodeError, User.DoesNotExist):
-#             raise exceptions.AuthenticationFailed('Invalid token)
-#         except jwt.ExpiredSignatureError:
-#             raise exceptions.AuthenticationFailed('Token has expired')
-#         return (user, payload)
+        keygen = generateKey()
+        key = base64.b32encode(keygen.returnValue(
+            phone).encode())  # Generating Key
+        OTP = pyotp.HOTP(key)  # HOTP Model
+        if OTP.verify(request.data["otp"], Mobile.counter):  # Verifying the OTP
+            Mobile.isVerified = True
+            Mobile.save()
+            return Response("You are authorised", status=200)
+        return Response("OTP is wrong", status=400)
 
 
 # class Authentication(authentication.BaseAuthentication):
@@ -267,8 +259,6 @@ class WizardFormViewSet(ObjectMultipleModelAPIViewSet):
     querylist = [
         {'queryset': WizardForm.objects.all(
         ), 'serializer_class': serializers.WizardFormSerializer},
-        {'queryset': PhoneOTP.objects.all(
-        ), 'serializer_class': serializers.PhoneOTPSerializer},
         {'queryset': Partner.objects.all(), 'serializer_class': PartnerSerializer}
     ]
 

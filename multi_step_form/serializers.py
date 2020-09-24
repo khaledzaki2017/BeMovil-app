@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from core.models import WizardForm, PhoneOTP, Partner
+from core.models import WizardForm, Partner
 
 
 class WizardFormSerializer(serializers.ModelSerializer):
@@ -15,16 +15,16 @@ class WizardFormSerializer(serializers.ModelSerializer):
         read_only_fields = ('id',)
 
 
-class PhoneOTPSerializer(serializers.ModelSerializer):
-    def __init__(self, *args, **kwargs):
-        many = kwargs.pop('many', True)
-        super(PhoneOTPSerializer, self).__init__(many=many, *args, **kwargs)
+# class PhoneOTPSerializer(serializers.ModelSerializer):
+#     def __init__(self, *args, **kwargs):
+#         many = kwargs.pop('many', True)
+#         super(PhoneOTPSerializer, self).__init__(many=many, *args, **kwargs)
 
-    class Meta:
-        model = PhoneOTP
-        fields = '__all__'
+#     class Meta:
+#         model = PhoneOTP
+#         fields = '__all__'
 
-        read_only_fields = ('id',)
+#         read_only_fields = ('id',)
 
 
 class FormImageSerializer(serializers.ModelSerializer):

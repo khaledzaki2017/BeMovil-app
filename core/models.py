@@ -87,27 +87,36 @@ class WizardForm(models.Model):
         return f'This is {self.firstname} {self.lastname} Form'
 
 
-class PhoneOTP(models.Model):
-    # phone_regex = RegexValidator(regex=r'^\+?234?\d(9,14)$',
-    #     message="Phone number must be entered in format of +2348044234244 up to 14 digits")
-    # phone = models.CharField(validator=[phone_regex], max_length=15, unique=True)
-    phone = models.CharField(max_length=15, unique=True)
-    otp = models.CharField(max_length=6)
-    initial = models.IntegerField(blank=True, null=True)
-    last = models.IntegerField(blank=True, null=True)
-    validated = models.BooleanField(default=False)
-    count = models.IntegerField(blank=True, null=True)
+class phoneModel(models.Model):
+    Mobile = models.IntegerField(blank=False)
+    isVerified = models.BooleanField(blank=False, default=False)
+    counter = models.IntegerField(default=0, blank=False)
 
     def __str__(self):
-        return f'{self.phone_number} is sent {self.otp}'
+        return str(self.Mobile)
 
 
-def add_timer(sender, instance, *args, **kwargs):
-    instance.initial = int(time.time())
-    instance.last = instance.initial + 30
+# class PhoneOTP(models.Model):
+#     # phone_regex = RegexValidator(regex=r'^\+?234?\d(9,14)$',
+#     #     message="Phone number must be entered in format of +2348044234244 up to 14 digits")
+#     # phone = models.CharField(validator=[phone_regex], max_length=15, unique=True)
+#     phone = models.CharField(max_length=15, unique=True)
+#     otp = models.CharField(max_length=6)
+#     initial = models.IntegerField(blank=True, null=True)
+#     last = models.IntegerField(blank=True, null=True)
+#     validated = models.BooleanField(default=False)
+#     count = models.IntegerField(blank=True, null=True)
+
+#     def __str__(self):
+#         return f'{self.phone_number} is sent {self.otp}'
 
 
-pre_save.connect(add_timer, sender=PhoneOTP)
+# def add_timer(sender, instance, *args, **kwargs):
+#     instance.initial = int(time.time())
+#     instance.last = instance.initial + 30
+
+
+# pre_save.connect(add_timer, sender=PhoneOTP)
 
 
 class Partner(models.Model):

@@ -3,7 +3,7 @@ from django.urls import path, include
 from rest_framework import routers
 
 from multi_step_form import views
-from .views import ValidatePhoneSendOTP
+# from .views import ValidatePhoneSendOTP
 
 router = routers.DefaultRouter()
 router.register('wizard', views.WizardFormViewSet, base_name='wizard')
@@ -20,7 +20,7 @@ urlpatterns = [
     path('filedetail/<int:pk>/', views.FileDetail.as_view()),
     path('filelist/', views.FileViewlist.as_view()),
 
-    path('validate_phone/', ValidatePhoneSendOTP.as_view()),
+    path("verify/<phone>/", views.getPhoneNumberRegistered.as_view(), name="OTP Gen"),
     path('email-check/', views.EmailCheck.as_view()),
     path('partner/', views.PartnerView.as_view()),
     path('partnerlist/', views.PartnerMainWizardListAPIView.as_view()),
