@@ -41,7 +41,6 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
     'core',
     'multi_step_form',
-    'pdf_results',
     'drf_multiple_model',
     'multiselectfield',
     'django_filters',
