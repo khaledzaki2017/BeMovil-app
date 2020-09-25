@@ -75,6 +75,11 @@ class WizardForm(models.Model):
     secondFile = models.FileField(upload_to='documents')
     file = models.BinaryField(null=True, blank=False)
 
+    name_info = models.CharField(max_length=250, null=True)
+    email_info = models.EmailField(null=True, unique=True, default="")
+    lastname_info = models.CharField(max_length=250, null=True)
+    number_info = models.IntegerField(null=True)
+
     id_image1 = models.ImageField(upload_to='user_images/id_images', null=True)
     id_image2 = models.ImageField(upload_to='user_images/id_images', null=True)
 
@@ -83,8 +88,9 @@ class WizardForm(models.Model):
     client_image3 = models.ImageField(upload_to='user_images/', null=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
-    def __str__(self):
-        return f'This is {self.firstname} {self.lastname} Form'
+
+def __str__(self):
+    return f'This is {self.firstname} {self.lastname} Form'
 
 
 class phoneModel(models.Model):
