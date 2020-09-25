@@ -130,33 +130,31 @@ class generateKey:
 
 class getPhoneNumberRegistered(APIView):
     # Get to Create a call for OTP
-    # @staticmethod
-    # def get(self, request):
-    #     phone = request.data.phone
-    #     try:
-    #         # if Mobile already exists the take this else create New One
-    #         Mobile = phoneModel.objects.get(Mobile=phone)
-    #     except ObjectDoesNotExist:
-    #         phoneModel.objects.create(
-    #             Mobile=phone,
-    #         )
-    #         Mobile = phoneModel.objects.get(
-    #             Mobile=phone)  # user Newly created Model
-    #     Mobile.counter += 1  # Update Counter At every Call
-    #     Mobile.save()  # Save the data
-    #     keygen = generateKey()
-    #     key = base64.b32encode(keygen.returnValue(
-    #         phone).encode())  # Key is generated
-    #     OTP = pyotp.HOTP(key)  # HOTP Model for OTP is created
-    #     print(OTP.at(Mobile.counter))
-    #     # Using Multi-Threading send the OTP Using Messaging Services like Twilio or Fast2sms
-    #     # Just for demonstration
-    #     return Response({"OTP": OTP.at(Mobile.counter)}, status=200)
+    @staticmethod
+    def get(request, phone):
+        try:
+            # if Mobile already exists the take this else create New One
+            Mobile = phoneModel.objects.get(Mobile=phone)
+        except ObjectDoesNotExist:
+            phoneModel.objects.create(
+                Mobile=phone,
+            )
+            Mobile = phoneModel.objects.get(
+                Mobile=phone)  # user Newly created Model
+        Mobile.counter += 1  # Update Counter At every Call
+        Mobile.save()  # Save the data
+        keygen = generateKey()
+        key = base64.b32encode(keygen.returnValue(
+            phone).encode())  # Key is generated
+        OTP = pyotp.HOTP(key)  # HOTP Model for OTP is created
+        print(OTP.at(Mobile.counter))
+        # Using Multi-Threading send the OTP Using Messaging Services like Twilio or Fast2sms
+        # Just for demonstration
+        return Response({"OTP": OTP.at(Mobile.counter)}, status=200)
 
     # This Method verifies the OTP
     @staticmethod
-    def post(self, request, *args, **kwargs):
-        phone = request.data.phone
+    def post(request, phone):
         try:
             Mobile = phoneModel.objects.get(Mobile=phone)
         except ObjectDoesNotExist:
@@ -320,3 +318,26 @@ class PartnerView(APIView):
 
 
 # ********************************************************************************************************
+# ********************************************************************************************************
+
+# class Step1ViewSet(viewsets.ModelViewSet):
+#     queryset = Step1FormModel.objects.all()
+#     serializer_class = serializers.Step1FormSerializer
+
+#    def getInitialdata(self, request, *args, **kwargs):
+#        sk = request.GET.get('sk', '')
+#        data = request.get_serializer
+#        if data:
+#           s = SessionStore(session_key=sk)
+#           s.delete()
+#             return Response({'result': data})
+#        return Response({'result': 'no data'})
+
+# class Step2ViewSet(viewsets.ModelViewSet):
+#     queryset = Step2FormModel.objects.all()
+#     serializer_class = serializers.Step2FormSerializer
+
+
+# class Step3ViewSet(viewsets.ModelViewSet):
+#     queryset = Step3FormModel.objects.all()
+#     serializer_class = serializers.Step3FormSerializer
