@@ -318,26 +318,3 @@ class PartnerView(APIView):
 
 
 # ********************************************************************************************************
-# ********************************************************************************************************
-
-# class Step1ViewSet(viewsets.ModelViewSet):
-#     queryset = Step1FormModel.objects.all()
-#     serializer_class = serializers.Step1FormSerializer
-
-#    def getInitialdata(self, request, *args, **kwargs):
-#        sk = request.GET.get('sk', '')
-#        data = request.get_serializer
-#        if data:
-#           s = SessionStore(session_key=sk)
-#           s.delete()
-#             return Response({'result': data})
-#        return Response({'result': 'no data'})
-
-# class Step2ViewSet(viewsets.ModelViewSet):
-#     queryset = Step2FormModel.objects.all()
-#     serializer_class = serializers.Step2FormSerializer
-
-
-# class Step3ViewSet(viewsets.ModelViewSet):
-#     queryset = Step3FormModel.objects.all()
-#     serializer_class = serializers.Step3FormSerializer
