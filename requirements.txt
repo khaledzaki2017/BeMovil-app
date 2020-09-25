@@ -9,3 +9,4 @@ django-filter
 six 
 drf-pdf 
 pyotp
+corsheaders

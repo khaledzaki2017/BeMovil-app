@@ -25,7 +25,7 @@ SECRET_KEY = '&kp!%99lucvg*g3rhs%ow*^%8#gyhpbwg_op#g+#l46-t)x2@g'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['192.168.56.1', 'localhost', '127.0.0.1']
 
 
 # Application definition
@@ -44,7 +44,9 @@ INSTALLED_APPS = [
     'drf_multiple_model',
     'multiselectfield',
     'django_filters',
-    'six'
+    'six',
+    'corsheaders',
+
 
 ]
 
@@ -63,6 +65,7 @@ REST_FRAMEWORK = {
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
