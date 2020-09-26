@@ -12,3 +12,4 @@ pyotp
 corsheaders
 psycopg2
 gunicorn
+django-heroku
