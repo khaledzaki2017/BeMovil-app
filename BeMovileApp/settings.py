@@ -161,3 +161,6 @@ EMAIL_HOST_USER = 'kzaky@bemovil.net'
 # EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD')
 EMAIL_HOST_PASSWORD = 'khaled39052159'
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+
+
+django_heroku.settings(locals())
