@@ -16,6 +16,10 @@ filters-django = "*"
 django-filter = "*"
 six = "*"
 drf-pdf = "*"
-
+pyotp= "*"
+corsheaders= "*"
+psycopg2= "*"
+gunicorn= "*"
+django-heroku= "*"
 [requires]
 python_version = "3.6"
