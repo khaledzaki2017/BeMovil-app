@@ -9,7 +9,7 @@ django-filter
 six 
 drf-pdf 
 pyotp
-corsheaders
+django-cors-headers
 psycopg2
 gunicorn
 django-heroku
