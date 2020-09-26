@@ -10,3 +10,5 @@ six
 drf-pdf 
 pyotp
 corsheaders
+psycopg2
+gunicorn
