@@ -26,7 +26,7 @@ SECRET_KEY = '&kp!%99lucvg*g3rhs%ow*^%8#gyhpbwg_op#g+#l46-t)x2@g'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ['192.168.56.1', 'bemovil-contract-form-server.herokuapp.com',
+ALLOWED_HOSTS = ['192.168.56.1', 'bemovil-form-live.herokuapp.com',
                  '192.168.1.5', 'localhost', '127.0.0.1']
 
 
