@@ -15,15 +15,15 @@ class WizardFormSerializer(serializers.ModelSerializer):
         read_only_fields = ('id',)
 
 
-# class PhoneOTPSerializer(serializers.ModelSerializer):
+# class ClientsDataSerializer(serializers.ModelSerializer):
 #     def __init__(self, *args, **kwargs):
 #         many = kwargs.pop('many', True)
-#         super(PhoneOTPSerializer, self).__init__(many=many, *args, **kwargs)
+#         super(ClientsDataSerializer, self).__init__(many=many, *args, **kwargs)
 
 #     class Meta:
-#         model = PhoneOTP
-#         fields = '__all__'
-
+#         model = WizardForm
+#         fields = ('id', 'firstname', 'lastname',
+#                   'email', 'created_at')
 #         read_only_fields = ('id',)
 
 
@@ -72,30 +72,3 @@ class PartnerWizardSerializer(serializers.ModelSerializer):
     class Meta:
         model = Partner
         fields = '__all__'
-
-
-# class Step1FormSerializer(serializers.ModelSerializer):
-#     """Serializer for Step1Form objects"""
-
-#     def __init__(self, *args, **kwargs):
-#         many = kwargs.pop('many', True)
-#         super(Step1FormSerializer, self).__init__(many=many, *args, **kwargs)
-
-#     class Meta:
-#         model = Step1FormModel
-#         fields = ('id', 'firstname', 'lastname',
-#                   'email', 'mobile_phone')
-#         read_only_fields = ('id',)
-
-
-# class Step2FormSerializer(serializers.ModelSerializer):
-#     """Serializer for Step2FormModel objects"""
-
-#     def __init__(self, *args, **kwargs):
-#         many = kwargs.pop('many', True)
-#         super(Step2FormSerializer, self).__init__(many=many, *args, **kwargs)
-
-#     class Meta:
-#         model = Step2FormModel
-#         fields = ('id', 'address', 'city', 'valley')
-#         read_only_fields = ('id',)
