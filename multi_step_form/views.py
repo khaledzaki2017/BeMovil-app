@@ -1,3 +1,5 @@
+from rest_framework.parsers import FileUploadParser
+from django.core.files.storage import FileSystemStorage
 import base64
 from core.models import phoneModel
 import pyotp
@@ -59,21 +61,21 @@ class WizardFormListView(viewsets.ModelViewSet):
         if serializer.is_valid(raise_exception=True):
             serializer.save()
             wizard_data = serializer.data
-            print(wizard_data)
-            client_email = wizard_data['email']
-            print(client_email)
-            client_name = wizard_data['firstname']
-            print(client_name)
-            current_site = get_current_site(request).domain
+            # print(wizard_data)
+            # client_email = wizard_data['email']
+            # print(client_email)
+            # client_name = wizard_data['firstname']
+            # print(client_name)
+            # current_site = get_current_site(request).domain
 
-            relativeLink = reverse('multi_step_form:email-check')
-            absurl = 'http://' + current_site + relativeLink
-            email_body = "Hello,"+client_name + "check yor data in the file below\n" + absurl
-            print(email_body)
-            data = {'email_body': email_body, 'to_email': [client_email],
-                    'email_subject': 'check your data'}
-            print(data)
-            Util.send_email(data)
+            # relativeLink = reverse('multi_step_form:email-check')
+            # absurl = 'http://' + current_site + relativeLink
+            # email_body = "Hello,"+client_name + "check yor data in the file below\n" + absurl
+            # print(email_body)
+            # data = {'email_body': email_body, 'to_email': [client_email],
+            #         'email_subject': 'check your data'}
+            # print(data)
+            # Util.send_email(data)
 
             return Response(wizard_data,
                             status=status.HTTP_201_CREATED)
@@ -119,7 +121,6 @@ class UserPicturesViewSet(viewsets.ModelViewSet):
 
 
 # **********************OTP VALIDATION*******************************
-
 
 # This class returns the string needed to generate the key
 class generateKey:
@@ -198,33 +199,59 @@ class getPhoneNumberRegistered(APIView):
 
 # ********************FILE VIEWS******************************
 
-def upload_handler(up_file, uploader):
-    for f in up_file:
-        dest = f'uploaded_files/{uploader}'
-        if not os.path.exists(dest):
-            os.makedirs(dest)
-        default_storage.save(f'{dest}/{f}', ContentFile(f.read()))
+
+# class FileView(APIView):
+#     # authentication_classes = (Authentication,)
+#     # parser_classes = (MultiPartParser, FormParser,)
+#     parser_classes = [FileUploadParser]
+
+#     # queryset = FileModel.objects.all()
+#     serializer_class = FileSerilizer
+#     # queryset = WizardForm.objects.values("firstFile", "secondFile")
+#     serializer_class = serializers.FileSerilizer
+
+#     def post(self, request, *args, **kwargs):
+#         # firstUploaded_files = request.FILES.getlist('firstFile')
+#         # secondUploaded_files = request.FILES.getlist('secondFile')
+#         # firstUploaded_files = request.data['file']
+#         # secondUploaded_files = request.data['file']
+
+#         file_serializer = FileSerilizer(data=request.data['file'])
+#         if file_serializer.is_valid():
+#             file_serializer.save()
+#             return Response(file_serializer.data, status=status.HTTP_201_CREATED)
+#         else:
+#             return Response(file_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-class FileView(APIView):
-    # authentication_classes = (Authentication,)
-    parser_classes = (MultiPartParser, FormParser,)
-    queryset = WizardForm.objects.values("firstFile", "secondFile", "uploader")
-    serializer_class = serializers.FileSerilizer
+# def upload_handler(up_file, uploader):
+#     for f in up_file:
+#         dest = f'uploaded_files/{uploader}'
+#         if not os.path.exists(dest):
+#             os.makedirs(dest)
+#         FileSystemStorage.save(f'{dest}/{f}', ContentFile(f.read()))
 
-    def post(self, request, *args, **kwargs):
-        firstUploaded_files = request.FILES.getlist('firstFile')
-        secondUploaded_files = request.FILES.getlist('secondFile')
 
-        uploader = dict(request.data)['uploader'][0]
-        upload_handler(firstUploaded_files, uploader)
-        upload_handler(secondUploaded_files, uploader)
-        file_serializer = FileSerilizer(data=request.data)
-        if file_serializer.is_valid():
-            file_serializer.save()
-            return Response(file_serializer.data, status=status.HTTP_201_CREATED)
-        else:
-            return Response(file_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+# class FileView(APIView):
+#     # authentication_classes = (Authentication,)
+#     parser_classes = (MultiPartParser, FormParser,)
+#     queryset = WizardForm.objects.values("firstFile", "secondFile", "uploader")
+#     serializer_class = serializers.FileSerilizer
+
+#     def post(self, request, *args, **kwargs):
+#         firstUploaded_files = request.FILES.getlist('firstFile')
+#         secondUploaded_files = request.FILES.getlist('secondFile')
+
+#         uploader = dict(request.data)['uploader'][0]
+#         upload_handler(firstUploaded_files, uploader)
+#         upload_handler(secondUploaded_files, uploader)
+#         file_serializer = FileSerilizer(data=request.data)
+#         if file_serializer.is_valid():
+#             file_serializer.save()
+#             return Response(file_serializer.data, status=status.HTTP_201_CREATED)
+#         else:
+#             return Response(file_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
     def get(self, request, pk=None):
         queryset = WizardForm.objects.values(

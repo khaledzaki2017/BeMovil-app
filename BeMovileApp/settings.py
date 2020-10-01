@@ -26,8 +26,8 @@ SECRET_KEY = '&kp!%99lucvg*g3rhs%ow*^%8#gyhpbwg_op#g+#l46-t)x2@g'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['192.168.56.1', 'bemovil-form-live.herokuapp.com',
-                 '192.168.1.5', ]
+ALLOWED_HOSTS = ['10.1.1.46', 'bemovil-form-live.herokuapp.com',
+                 '192.168.1.5', 'localhost:3000']
 
 
 # Application definition
@@ -53,17 +53,33 @@ INSTALLED_APPS = [
 
 
 ]
+# REST_FRAMEWORK = {
+#     'DEFAULT_AUTHENTICATION_CLASSES': (
+#         'rest_framework.authentication.TokenAuthentication',
+#     ),
+#     'DEFAULT_PERMISSION_CLASSES': (
+#         'rest_framework.permissions.IsAdminUser'
+#     ),
+# }
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': (
-        'rest_framework.permissions.IsAuthenticated',
+        # 'rest_framework.permissions.IsAuthenticated',
+        # 'rest_framework.permissions.IsAdminUser',
+
     ),
     "DEFAULT_PARSER_CLASSES": [
         "rest_framework.parsers.JSONParser",
+        # "rest_framework.parsers.FormParser",
+        # "rest_framework.parsers.MultiPartParser",
+
+
     ],
     "DEFAULT_AUTHENTICATION_CLASSES": [
         "rest_framework.authentication.SessionAuthentication",
-        'rest_framework.authentication.BasicAuthentication',
-        "rest_framework_simplejwt.authentication.JWTAuthentication",
+        # 'rest_framework.authentication.BasicAuthentication',
+        # "rest_framework_simplejwt.authentication.JWTAuthentication",
+        'rest_framework.authentication.TokenAuthentication',
+
     ],
     # "DEFAULT_SCHEMA_CLASS": "rest_framework.schemas.coreapi.AutoSchema",
     'DEFAULT_FILTER_BACKENDS': ('django_filters.rest_framework.DjangoFilterBackend',)

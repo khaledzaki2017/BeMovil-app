@@ -31,7 +31,7 @@ urlpatterns = [
     path('api/', include('multi_step_form.urls')),
     path('adminpanel/', include('adminpanel.urls')),
     # path('pdf/', include('pdf_results.urls')),
-    path('auth/', include('rest_framework.urls')),
+    # path('auth/', include('rest_framework.urls')),
     path('api/token/', TokenObtainPairView.as_view(),
          name='token_obtain_pair'),  # new
     path('api/refresh/', TokenRefreshView.as_view(),

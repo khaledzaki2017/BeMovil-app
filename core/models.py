@@ -33,8 +33,8 @@ from multiselectfield import MultiSelectField
 #         return str(self.email)
 
 
-TYPE_CHOICES = ((1, 'Natural'),
-                (2, 'Juridica'))
+# TYPE_CHOICES = ((1, 'Natural'),
+#                 (2, 'Juridica'))
 
 
 class WizardForm(models.Model):
@@ -43,7 +43,7 @@ class WizardForm(models.Model):
     #     primary_key=True, null=False, unique=True, default=uuid.uuid4, editable=False)
     email = models.EmailField(
         primary_key=True, null=False, unique=True, default="")
-    _type = models.CharField(max_length=100, choices=TYPE_CHOICES)
+    _type = models.CharField(max_length=100,  null=True)
     personal_id = models.TextField(max_length=250, null=True)
     firstname = models.CharField(max_length=250, null=True)
     lastname = models.CharField(max_length=250, null=True)
@@ -72,10 +72,10 @@ class WizardForm(models.Model):
     egresos = models.IntegerField(blank=True, null=True)
     total_pasivos = models.IntegerField(blank=True, null=True)
 
-    uploader = models.CharField(max_length=250, null=True)
-    firstFile = models.FileField(upload_to='documents')
-    secondFile = models.FileField(upload_to='documents')
-    file = models.BinaryField(null=True, blank=False)
+    # uploader = models.CharField(max_length=250, null=True)
+    # firstFile = models.FileField(upload_to='documents')
+    # secondFile = models.FileField(upload_to='documents')
+    # file = models.BinaryField(null=True, blank=False)
 
     name_info = models.CharField(max_length=250, null=True)
     email_info = models.EmailField(null=True, unique=True, default="")
@@ -130,13 +130,9 @@ class User(AbstractUser):
         return "{}".format(self.email)
 
 
-class UserProfile(models.Model):
-    user = models.OneToOneField(
-        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='profile')
-    title = models.CharField(max_length=5)
-    dob = models.DateField()
-    address = models.CharField(max_length=255)
-    country = models.CharField(max_length=50)
-    city = models.CharField(max_length=50)
-    zip = models.CharField(max_length=5)
-    photo = models.ImageField(upload_to='uploads', blank=True)
+# class UserProfile(models.Model):
+#     user = models.OneToOneField(
+#         settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='profile')
+#     title = models.CharField(max_length=5)
+#     dob = models.DateField()
+    # photo = models.ImageField(upload_to='uploads', blank=True)
