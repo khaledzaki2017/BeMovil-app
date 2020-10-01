@@ -1,4 +1,3 @@
-from .serializers import FileSerilizer
 from django.core.files.base import ContentFile
 from rest_framework import status
 from rest_framework.parsers import FileUploadParser
@@ -9,10 +8,10 @@ import pyotp
 from django.core.exceptions import ObjectDoesNotExist
 from datetime import datetime
 import random
-from core.models import WizardForm, Partner
+from core.models import WizardForm, Partner, Email
 from multi_step_form import serializers
 from drf_multiple_model.viewsets import ObjectMultipleModelAPIViewSet
-from .serializers import FileSerilizer, PartnerSerializer, PartnerWizardSerializer
+from .serializers import FileSerilizer, PartnerSerializer, PartnerWizardSerializer, EmailSerializer
 import os
 import django_filters
 from .utils import Util
@@ -57,6 +56,14 @@ class WizardFormListView(viewsets.ModelViewSet):
     queryset = WizardForm.objects.all()
     serializer_class = serializers.WizardFormSerializer
     filterset_class = TFilter
+    parser_classes = (MultiPartParser,)
+
+    # def list(self, request):
+    #     if (request.data['_type'] == "Juridica"):
+    #         email = self.request.query_params.get('email', None)
+    #         partner=Partner.objects.filter(main=email)
+
+    #     return Response(serializer.data)
 
     def create(self, request):
         wizardData = request.data
@@ -88,10 +95,69 @@ class WizardFormListView(viewsets.ModelViewSet):
 
 
 class EmailCheck(generics.GenericAPIView):
-    def get(self, request):
-        response = HttpResponse(
-            "Please Check your Mailbox to verify your Data.")
-        return response
+
+    queryset = Email.objects.all()
+    serializer_class = serializers.EmailSerializer
+    # filterset_class = TFilter
+    # parser_classes = (MultiPartParser,)
+
+    # def list(self, request):
+    #     if (request.data['_type'] == "Juridica"):
+    #         email = self.request.query_params.get('email', None)
+    #         partner=Partner.objects.filter(main=email)
+
+    #     return Response(serializer.data)
+
+    def post(self, request):
+        # wizardData = request.data
+        # serializer = self.serializer_class(data=wizardData)
+        # # if serializer.is_valid(raise_exception=True):
+        # #     serializer.save()
+        # wizard_data = serializer.data
+        fulldata = self.request.data
+        if(fulldata):
+            print(fulldata)
+            client_email = fulldata['email']
+            print(client_email)
+            client_name = fulldata['firstname']
+            print(client_name)
+            # current_site = get_current_site(request).domain
+            pdf_url = fulldata['url']
+            print(pdf_url)
+            # relativeLink = reverse('multi_step_form:email-check')
+            # absurl = 'http://' + current_site + relativeLink
+            email_body = "Hello,"+client_name + "check yor data in the file below\n" + pdf_url
+            print(email_body)
+            data = {'email_body': email_body, 'to_email': [client_email],
+                    'email_subject': 'check your data'}
+            print(data)
+            Util.send_email(data)
+
+            return Response("Email sent successfully ",
+                            status=status.HTTP_201_CREATED)
+        else:
+            return Response("try again!, something wrong",
+                            status=status.HTTP_400_BAD_REQUEST)
+
+     # print(wizard_data)
+            # client_email = wizard_data['email']
+            # print(client_email)
+            # client_name = wizard_data['firstname']
+            # print(client_name)
+            # current_site = get_current_site(request).domain
+
+            # relativeLink = reverse('multi_step_form:email-check')
+            # absurl = 'http://' + current_site + relativeLink
+            # email_body = "Hello,"+client_name + "check yor data in the file below\n" + absurl
+            # print(email_body)
+            # data = {'email_body': email_body, 'to_email': [client_email],
+            #         'email_subject': 'check your data'}
+            # print(data)
+            # Util.send_email(data)
+    # def get(self, request):
+    #     response = HttpResponse(
+    #         "Please Check your Mailbox to verify your Data.")
+    #     return response
 
 
 # ********************USER IMAGES VIEW**************
@@ -291,6 +357,7 @@ def upload_handler(up_file, uploader, request):
 #             return Response(file_serializer.data, status=status.HTTP_201_CREATED)
 #         else:
 #             return Response(file_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
     def get(self, request, pk=None):
         queryset = WizardForm.objects.values(

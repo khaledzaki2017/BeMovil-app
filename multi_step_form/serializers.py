@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from core.models import WizardForm, Partner
+from core.models import WizardForm, Partner, Email
 
 
 class WizardFormSerializer(serializers.ModelSerializer):
@@ -69,3 +69,11 @@ class PartnerWizardSerializer(serializers.ModelSerializer):
     class Meta:
         model = Partner
         fields = '__all__'
+
+
+class EmailSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Email
+        fields = '__all__'
+        read_only_fields = ('id',)
