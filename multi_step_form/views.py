@@ -1,3 +1,6 @@
+from .serializers import FileSerilizer
+from django.core.files.base import ContentFile
+from rest_framework import status
 from rest_framework.parsers import FileUploadParser
 from django.core.files.storage import FileSystemStorage
 import base64
@@ -199,11 +202,44 @@ class getPhoneNumberRegistered(APIView):
 
 # ********************FILE VIEWS******************************
 
+class FileView(APIView):
+    parser_classes = (MultiPartParser,)
+    queryset = WizardForm.objects.values("firstFile", "secondFile", "uploader")
+    serializer_class = serializers.FileSerilizer
+
+    def post(self, request, *args, **kwargs):
+        firstUploaded_files = request.FILES.getlist('firstFile')
+        secondUploaded_files = request.FILES.getlist('secondFile')
+
+        uploader = dict(request.data)['uploader'][0]
+        upload_handler(firstUploaded_files, uploader, request)
+        upload_handler(secondUploaded_files, uploader, request)
+        file_serializer = FileSerilizer(data=request.data)
+
+        if file_serializer.is_valid():
+            file_serializer.save()
+            return Response(file_serializer.data, status=status.HTTP_201_CREATED)
+        else:
+            return Response(file_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+def upload_handler(up_file, uploader, request):
+    for f in up_file:
+        print(f)
+        dest = f'uploaded_files/{uploader}'
+        # current_site = get_current_site(request).domain
+
+        if not os.path.exists(dest):
+            os.makedirs(dest)
+
+        default_storage.save(
+            f'{dest}/{f}', ContentFile(f.read()))
 
 # class FileView(APIView):
 #     # authentication_classes = (Authentication,)
 #     # parser_classes = (MultiPartParser, FormParser,)
-#     parser_classes = [FileUploadParser]
+#     # parser_classes = [FileUploadParser]
+#     parser_classes = (MultiPartParser, FileUploadParser)
 
 #     # queryset = FileModel.objects.all()
 #     serializer_class = FileSerilizer
@@ -211,17 +247,21 @@ class getPhoneNumberRegistered(APIView):
 #     serializer_class = serializers.FileSerilizer
 
 #     def post(self, request, *args, **kwargs):
+#         files_list = request.FILES
+#         data = request.data
+#         return Response(data={"files": "{} files uploaded".format(len(files_list)),
+#                               "data": "{} data included".format(len(data))})
 #         # firstUploaded_files = request.FILES.getlist('firstFile')
 #         # secondUploaded_files = request.FILES.getlist('secondFile')
 #         # firstUploaded_files = request.data['file']
 #         # secondUploaded_files = request.data['file']
 
-#         file_serializer = FileSerilizer(data=request.data['file'])
-#         if file_serializer.is_valid():
-#             file_serializer.save()
-#             return Response(file_serializer.data, status=status.HTTP_201_CREATED)
-#         else:
-#             return Response(file_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+#         # file_serializer = FileSerilizer(data=request.data)
+#         # if file_serializer.is_valid():
+#         #     file_serializer.save()
+#         #     return Response(file_serializer.data, status=status.HTTP_201_CREATED)
+#         # else:
+#         #     return Response(file_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 # def upload_handler(up_file, uploader):
@@ -251,7 +291,6 @@ class getPhoneNumberRegistered(APIView):
 #             return Response(file_serializer.data, status=status.HTTP_201_CREATED)
 #         else:
 #             return Response(file_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
 
     def get(self, request, pk=None):
         queryset = WizardForm.objects.values(

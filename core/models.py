@@ -39,10 +39,10 @@ from multiselectfield import MultiSelectField
 
 class WizardForm(models.Model):
 
-    # id = models.UUIDField(
-    #     primary_key=True, null=False, unique=True, default=uuid.uuid4, editable=False)
-    email = models.EmailField(
-        primary_key=True, null=False, unique=True, default="")
+    id = models.UUIDField(
+        primary_key=True, null=False, unique=True, default=uuid.uuid4, editable=False)
+    # email = models.EmailField(
+    #     primary_key=True, null=False, default="")
     _type = models.CharField(max_length=100,  null=True)
     personal_id = models.TextField(max_length=250, null=True)
     firstname = models.CharField(max_length=250, null=True)
@@ -64,7 +64,7 @@ class WizardForm(models.Model):
     ciudad = models.CharField(max_length=250, null=True)
     departamento = models.CharField(max_length=250, null=True)
     mobile_phone_fin = models.IntegerField(null=True)
-    email_fin = models.EmailField(null=True, unique=True, default="")
+    # email_fin = models.EmailField(null=True, unique=True, default="")
 
     telefono_fijo = models.IntegerField(blank=True, null=True)
     ingresos = models.IntegerField(blank=True, null=True)
@@ -72,13 +72,12 @@ class WizardForm(models.Model):
     egresos = models.IntegerField(blank=True, null=True)
     total_pasivos = models.IntegerField(blank=True, null=True)
 
-    # uploader = models.CharField(max_length=250, null=True)
-    # firstFile = models.FileField(upload_to='documents')
-    # secondFile = models.FileField(upload_to='documents')
-    # file = models.BinaryField(null=True, blank=False)
+    uploader = models.CharField(max_length=250, null=True, default="")
+    firstFile = models.FileField(upload_to='documents', default="")
+    secondFile = models.FileField(upload_to='documents', default="")
 
     name_info = models.CharField(max_length=250, null=True)
-    email_info = models.EmailField(null=True, unique=True, default="")
+    # email_info = models.EmailField(null=True, unique=True, default="")
     lastname_info = models.CharField(max_length=250, null=True)
     number_info = models.IntegerField(null=True)
 

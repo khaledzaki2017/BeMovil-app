@@ -16,7 +16,7 @@ app_name = 'multi_step_form'
 
 urlpatterns = [
     path('', include(router.urls)),
-    # path('file/', views.FileView.as_view()),
+    path('file/', views.FileView.as_view()),
     path('filedetail/<int:pk>/', views.FileDetail.as_view()),
     path('filelist/', views.FileViewlist.as_view()),
 

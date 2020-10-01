@@ -42,9 +42,6 @@ class FormImageSerializer(serializers.ModelSerializer):
 
 
 class FileSerilizer(serializers.ModelSerializer):
-    def __init__(self, *args, **kwargs):
-        many = kwargs.pop('many', True)
-        super(FileSerilizer, self).__init__(many=many, *args, **kwargs)
 
     class Meta:
         model = WizardForm
