@@ -58,13 +58,6 @@ class WizardFormListView(viewsets.ModelViewSet):
     filterset_class = TFilter
     parser_classes = (MultiPartParser,)
 
-    # def list(self, request):
-    #     if (request.data['_type'] == "Juridica"):
-    #         email = self.request.query_params.get('email', None)
-    #         partner=Partner.objects.filter(main=email)
-
-    #     return Response(serializer.data)
-
     def create(self, request):
         wizardData = request.data
         serializer = self.serializer_class(data=wizardData)
@@ -92,6 +85,19 @@ class WizardFormListView(viewsets.ModelViewSet):
         else:
             return Response(serializer.errors,
                             status=status.HTTP_400_BAD_REQUEST)
+
+    def patch(self, request, email):
+        model_object = self.get_object(email)
+        serializer = serializer_class(
+            model_object, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return JsonResponse(code=201, data=serializer.data)
+        return JsonResponse(code=400, data="wrong parameters")
+
+
+# class Test(APIView):
+#     serializer_class = serializers.WizardFormSerializer()
 
 
 class EmailCheck(generics.GenericAPIView):
@@ -358,7 +364,6 @@ def upload_handler(up_file, uploader, request):
 #         else:
 #             return Response(file_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-
     def get(self, request, pk=None):
         queryset = WizardForm.objects.values(
             "firstFile", "secondFile", "uploader")
@@ -451,7 +456,7 @@ class PartnerView(APIView):
             return Response(serializer.errors,
                             status=status.HTTP_400_BAD_REQUEST)
 
-    def get(self, request, pk=None):
+    def get(self, request, *args, **kwargs):
         queryset = Partner.objects.all()
         serializer_class = serializers.PartnerSerializer()
         return Response(serializer_class.data)

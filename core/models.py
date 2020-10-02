@@ -39,10 +39,11 @@ from multiselectfield import MultiSelectField
 
 class WizardForm(models.Model):
 
-    id = models.UUIDField(
-        primary_key=True, null=False, unique=True, default=uuid.uuid4, editable=False)
-    # email = models.EmailField(
-    #     primary_key=True, null=False, default="")
+    # id = models.UUIDField(
+    #     primary_key=True, null=False, unique=True, default=uuid.uuid4, editable=False)
+    email = models.EmailField(
+        primary_key=True, null=False, default="")
+    # email = models.EmailField(null=True)
     _type = models.CharField(max_length=100,  null=True)
     personal_id = models.TextField(max_length=250, null=True)
     firstname = models.CharField(max_length=250, null=True)
@@ -88,6 +89,7 @@ class WizardForm(models.Model):
     client_image2 = models.ImageField(upload_to='user_images/', null=True)
     client_image3 = models.ImageField(upload_to='user_images/', null=True)
     created_at = models.DateTimeField(auto_now_add=True)
+    status = models.BooleanField(null=True)
 
 
 def __str__(self):
@@ -129,12 +131,14 @@ class User(AbstractUser):
         return "{}".format(self.email)
 
 
-# class UserProfile(models.Model):
-#     user = models.OneToOneField(
-#         settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='profile')
-#     title = models.CharField(max_length=5)
-#     dob = models.DateField()
+class UserProfile(models.Model):
+    user = models.OneToOneField(
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='profile')
+    # title = models.CharField(max_length=5)
+    # dob = models.DateField()
     # photo = models.ImageField(upload_to='uploads', blank=True)
+
+
 class Email(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     email = models.EmailField(null=True)

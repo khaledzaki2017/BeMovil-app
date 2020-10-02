@@ -29,7 +29,7 @@ schema_view = get_swagger_view(title='App APIs')
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include('multi_step_form.urls')),
-    path('adminpanel/', include('adminpanel.urls')),
+    # path('adminpanel/', include('adminpanel.urls')),
     # path('pdf/', include('pdf_results.urls')),
     # path('auth/', include('rest_framework.urls')),
     path('api/token/', TokenObtainPairView.as_view(),

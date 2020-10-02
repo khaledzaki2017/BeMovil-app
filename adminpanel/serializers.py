@@ -1,18 +1,17 @@
 from rest_framework import serializers
-from core.models import User
+from core.models import User, UserProfile
 from drf_writable_nested.serializers import WritableNestedModelSerializer
 
 
-# class UserProfileSerializer(serializers.ModelSerializer):
+class UserProfileSerializer(serializers.ModelSerializer):
 
-#     class Meta:
-#         model = UserProfile
-#         fields = ('title', 'dob')
-#         lookup_field = 'title'
+    class Meta:
+        model = UserProfile
+        fields = '__all__'
 
 
 class UserSerializer(WritableNestedModelSerializer, serializers.ModelSerializer):
-    # profile = UserProfileSerializer(required=True)
+    profile = UserProfileSerializer(required=True)
     # profile = serializers.HyperlinkedIdentityField(
     #     view_name='user-detail',
     #     many=True,
@@ -23,7 +22,7 @@ class UserSerializer(WritableNestedModelSerializer, serializers.ModelSerializer)
     class Meta:
         model = User
         fields = ('email', 'first_name',
-                  'last_name', 'password')
+                  'last_name', 'password', "profile")
         extra_kwargs = {'password': {'write_only': True}}
         # lookup_field = 'user__username'
 
