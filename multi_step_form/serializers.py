@@ -15,6 +15,20 @@ class WizardFormSerializer(serializers.ModelSerializer):
         read_only_fields = ('id',)
 
 
+class WizardUpdateSerializer(serializers.ModelSerializer):
+    def __init__(self, *args, **kwargs):
+        many = kwargs.pop('many', True)
+        super(WizardUpdateSerializer, self).__init__(
+            many=many, *args, **kwargs)
+
+    class Meta:
+        model = WizardForm
+        # fields = ('id', 'firstname', 'lastname',
+        #           'email',)
+        fields = '__all__'
+        read_only_fields = ('id',)
+
+
 # class ClientsDataSerializer(serializers.ModelSerializer):
 #     def __init__(self, *args, **kwargs):
 #         many = kwargs.pop('many', True)

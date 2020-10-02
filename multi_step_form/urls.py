@@ -19,7 +19,7 @@ urlpatterns = [
     path('file/', views.FileView.as_view()),
     path('filedetail/<int:pk>/', views.FileDetail.as_view()),
     path('filelist/', views.FileViewlist.as_view()),
-
+    path("wizardlist/update/", views.WizardFormUpdateView),
     path("verify/<phone>/", views.getPhoneNumberRegistered.as_view(), name="OTP Gen"),
     path('email-check/', views.EmailCheck.as_view()),
     path('partner/', views.PartnerView.as_view()),

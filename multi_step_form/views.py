@@ -11,7 +11,7 @@ import random
 from core.models import WizardForm, Partner, Email
 from multi_step_form import serializers
 from drf_multiple_model.viewsets import ObjectMultipleModelAPIViewSet
-from .serializers import FileSerilizer, PartnerSerializer, PartnerWizardSerializer, EmailSerializer
+from .serializers import FileSerilizer, PartnerSerializer, PartnerWizardSerializer, EmailSerializer, WizardUpdateSerializer
 import os
 import django_filters
 from .utils import Util
@@ -86,10 +86,19 @@ class WizardFormListView(viewsets.ModelViewSet):
             return Response(serializer.errors,
                             status=status.HTTP_400_BAD_REQUEST)
 
-    def patch(self, request, email):
+
+class WizardFormUpdateView(viewsets.ModelViewSet):
+    # authentication_classes = (Authentication,)
+    queryset = WizardForm.objects.all()
+    serializer_class = serializers.WizardUpdateSerializer
+    filterset_class = TFilter
+    parser_classes = (MultiPartParser,)
+
+    def update(self, request, email):
         model_object = self.get_object(email)
         serializer = serializer_class(
             model_object, data=request.data, partial=True)
+        print("here")
         if serializer.is_valid():
             serializer.save()
             return JsonResponse(code=201, data=serializer.data)
@@ -363,6 +372,7 @@ def upload_handler(up_file, uploader, request):
 #             return Response(file_serializer.data, status=status.HTTP_201_CREATED)
 #         else:
 #             return Response(file_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
     def get(self, request, pk=None):
         queryset = WizardForm.objects.values(
