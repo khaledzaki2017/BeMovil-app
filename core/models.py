@@ -90,6 +90,11 @@ class WizardForm(models.Model):
     client_image3 = models.ImageField(upload_to='user_images/', null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     status = models.BooleanField(default=False)
+    Razon_social = models.CharField(max_length=250, null=True)
+    nit = models.CharField(max_length=250, null=True)
+    home_address = models.CharField(max_length=250, null=True)
+    question1 = models.BooleanField(default=False)
+    question2 = models.BooleanField(default=False)
 
 
 def __str__(self):

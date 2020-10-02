@@ -21,6 +21,15 @@ class WizardUpdateSerializer(serializers.ModelSerializer):
         super(WizardUpdateSerializer, self).__init__(
             many=many, *args, **kwargs)
 
+    def update(self, instance, validated_data):
+
+        instance.email = validated_data["email"]
+        instance.status = validated_data["status"]
+
+        instance.save()
+
+        return instance
+
     class Meta:
         model = WizardForm
         # fields = ('id', 'firstname', 'lastname',
