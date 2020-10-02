@@ -89,7 +89,7 @@ class WizardForm(models.Model):
     client_image2 = models.ImageField(upload_to='user_images/', null=True)
     client_image3 = models.ImageField(upload_to='user_images/', null=True)
     created_at = models.DateTimeField(auto_now_add=True)
-    status = models.BooleanField(null=True)
+    status = models.BooleanField(default=False)
 
 
 def __str__(self):
