@@ -65,7 +65,7 @@ class WizardForm(models.Model):
     ciudad = models.CharField(max_length=250, null=True)
     departamento = models.CharField(max_length=250, null=True)
     mobile_phone_fin = models.IntegerField(null=True)
-    # email_fin = models.EmailField(null=True, unique=True, default="")
+    email_fin = models.EmailField(null=True, unique=True, default="")
 
     telefono_fijo = models.IntegerField(blank=True, null=True)
     ingresos = models.IntegerField(blank=True, null=True)
@@ -78,7 +78,7 @@ class WizardForm(models.Model):
     secondFile = models.FileField(upload_to='documents', default="")
 
     name_info = models.CharField(max_length=250, null=True)
-    # email_info = models.EmailField(null=True, unique=True, default="")
+    email_info = models.EmailField(null=True, unique=True, default="")
     lastname_info = models.CharField(max_length=250, null=True)
     number_info = models.IntegerField(null=True)
 
