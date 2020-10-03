@@ -23,7 +23,6 @@ class WizardUpdateSerializer(serializers.ModelSerializer):
 
     def update(self, instance, validated_data):
 
-        instance.email = validated_data["email"]
         instance.status = validated_data["status"]
 
         instance.save()
@@ -34,7 +33,7 @@ class WizardUpdateSerializer(serializers.ModelSerializer):
         model = WizardForm
         # fields = ('id', 'firstname', 'lastname',
         #           'email',)
-        fields = '__all__'
+        fields = ['status']
         read_only_fields = ('id',)
 
 

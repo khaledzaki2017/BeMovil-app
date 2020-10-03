@@ -87,22 +87,20 @@ class WizardFormListView(viewsets.ModelViewSet):
                             status=status.HTTP_400_BAD_REQUEST)
 
 
-class WizardFormUpdateView(viewsets.ModelViewSet):
-    # authentication_classes = (Authentication,)
+class UpdateView(generics.UpdateAPIView):
+    serializer_class = WizardUpdateSerializer
     queryset = WizardForm.objects.all()
-    serializer_class = serializers.WizardUpdateSerializer
-    filterset_class = TFilter
-    parser_classes = (MultiPartParser,)
+    lookup_field = 'email'
+    # def update(self, request, email):
+    #     model_object = WizardForm.objects.filter(pk=email).get(status=status)
 
-    def update(self, request, email):
-        model_object = self.get_object(email)
-        serializer = serializer_class(
-            model_object, data=request.data, partial=True)
-        print("here")
-        if serializer.is_valid():
-            serializer.save()
-            return JsonResponse(code=201, data=serializer.data)
-        return JsonResponse(code=400, data="wrong parameters")
+    #     serializer = serializer_class(
+    #         model_object, data=request.data, partial=True)
+    #     print("here")
+    #     if serializer.is_valid():
+    #         serializer.save()
+    #         return JsonResponse(code=201, data=serializer.data)
+    #     return JsonResponse(code=400, data="wrong parameters")
 
 
 # class Test(APIView):
