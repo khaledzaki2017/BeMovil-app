@@ -1,41 +1,77 @@
 from rest_framework import serializers
-from core.models import WizardForm, Partner, Email
+from core.models import WizardFormJuridica, WizardFormNatural, Partner, Email
 
 
-class WizardFormSerializer(serializers.ModelSerializer):
+class WizardFormNaturalSerializer(serializers.ModelSerializer):
     def __init__(self, *args, **kwargs):
         many = kwargs.pop('many', True)
-        super(WizardFormSerializer, self).__init__(many=many, *args, **kwargs)
+        super(WizardFormNaturalSerializer, self).__init__(
+            many=many, *args, **kwargs)
 
     class Meta:
-        model = WizardForm
+        model = WizardFormNatural
         # fields = ('id', 'firstname', 'lastname',
         #           'email',)
         fields = '__all__'
         read_only_fields = ('id',)
 
 
-class WizardUpdateSerializer(serializers.ModelSerializer):
+class WizardFormJuridicaSerializer(serializers.ModelSerializer):
     def __init__(self, *args, **kwargs):
         many = kwargs.pop('many', True)
-        super(WizardUpdateSerializer, self).__init__(
+        super(WizardFormJuridicaSerializer, self).__init__(
             many=many, *args, **kwargs)
 
-    def update(self, instance, validated_data):
-
-        instance.status = validated_data["status"]
-
-        instance.save()
-
-        return instance
-
     class Meta:
-        model = WizardForm
+        model = WizardFormJuridica
         # fields = ('id', 'firstname', 'lastname',
         #           'email',)
-        fields = ['status']
+        fields = '__all__'
         read_only_fields = ('id',)
 
+
+# class WizardNaturalUpdateSerializer(serializers.ModelSerializer):
+#     def __init__(self, *args, **kwargs):
+#         many = kwargs.pop('many', True)
+#         super(WizardNaturalUpdateSerializer, self).__init__(
+#             many=many, *args, **kwargs)
+
+#     def update(self, instance, validated_data):
+
+#         instance.status = validated_data["status"]
+
+#         instance.save()
+
+#         return instance
+
+#     class Meta:
+#         model = WizardFormNatural
+#         # fields = ('id', 'firstname', 'lastname',
+#         #           'email',)
+#         fields = ['status']
+#         read_only_fields = ('id',)
+
+
+# class WizardJuridicaUpdateSerializer(serializers.ModelSerializer):
+#     def __init__(self, *args, **kwargs):
+#         many = kwargs.pop('many', True)
+#         super(WizardJuridicaUpdateSerializer, self).__init__(
+#             many=many, *args, **kwargs)
+
+#     def update(self, instance, validated_data):
+
+#         instance.status = validated_data["status"]
+
+#         instance.save()
+
+#         return instance
+
+#     class Meta:
+#         model = WizardFormJuridica
+#         # fields = ('id', 'firstname', 'lastname',
+#         #           'email',)
+#         fields = ['status']
+#         read_only_fields = ('id',)
 
 # class ClientsDataSerializer(serializers.ModelSerializer):
 #     def __init__(self, *args, **kwargs):
@@ -49,25 +85,25 @@ class WizardUpdateSerializer(serializers.ModelSerializer):
 #         read_only_fields = ('id',)
 
 
-class FormImageSerializer(serializers.ModelSerializer):
-    """Serializer for uploading images """
+# class FormImageSerializer(serializers.ModelSerializer):
+#     """Serializer for uploading images """
 
-    def __init__(self, *args, **kwargs):
-        many = kwargs.pop('many', True)
-        super(FormImageSerializer, self).__init__(many=many, *args, **kwargs)
+#     def __init__(self, *args, **kwargs):
+#         many = kwargs.pop('many', True)
+#         super(FormImageSerializer, self).__init__(many=many, *args, **kwargs)
 
-    class Meta:
-        model = WizardForm
-        fields = ('id_image1', 'id_image2', 'client_image1',
-                  'client_image2', 'client_image3')
-        # read_only_fields = ('id',)
+#     class Meta:
+#         model = WizardForm
+#         fields = ('id_image1', 'id_image2', 'client_image1',
+#                   'client_image2', 'client_image3')
+#         # read_only_fields = ('id',)
 
 
-class FileSerilizer(serializers.ModelSerializer):
+# class FileSerilizer(serializers.ModelSerializer):
 
-    class Meta:
-        model = WizardForm
-        fields = ('firstFile', 'secondFile', 'uploader')
+#     class Meta:
+#         model = WizardForm
+#         fields = ('firstFile', 'secondFile', 'uploader')
 
 
 class PartnerSerializer(serializers.ModelSerializer):
