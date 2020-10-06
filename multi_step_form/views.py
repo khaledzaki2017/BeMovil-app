@@ -122,8 +122,7 @@ class WizardFormJuridicaListView(viewsets.ModelViewSet):
         # print("testttttttttttttt", mydata)
         # if type(mydata) is str:
         #     formated = img_handler(mydata)
-        #     id_image1 = WizardFormJuridica.id_image1
-        #     WizardFormJuridica.save(id_image1, formated)
+        #     WizardFormJuridica.save( formated,save=True)
         # # *************************************************************
         # else:
         wizardData = request.data
@@ -144,7 +143,6 @@ class WizardFormJuridicaListView(viewsets.ModelViewSet):
         else:
             return Response(serializer.errors,
                             status=status.HTTP_400_BAD_REQUEST)
-
 
 def img_handler(data):
     format, imgstr = data.split(';base64,')
@@ -192,6 +190,7 @@ def upload_handler(up_file, uploader):
 
         default_storage.save(
             f'{dest}/{f}', ContentFile(f.read()))
+
 
 
 class EmailCheck(generics.GenericAPIView):

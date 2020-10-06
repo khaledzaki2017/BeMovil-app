@@ -172,7 +172,7 @@ class WizardFormJuridica(models.Model):
 
     def save(self, *args, **kwargs):
         print('save() is called.')
-        super().all(*args, **kwargs)
+        super(WizardFormJuridica, self).save(*args, **kwargs)
 
 
 class phoneModel(models.Model):
