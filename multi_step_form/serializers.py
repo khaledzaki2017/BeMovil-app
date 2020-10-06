@@ -13,7 +13,6 @@ class WizardFormNaturalSerializer(serializers.ModelSerializer):
         # fields = ('id', 'firstname', 'lastname',
         #           'email',)
         fields = '__all__'
-        read_only_fields = ('id',)
 
 
 class WizardFormJuridicaSerializer(serializers.ModelSerializer):
@@ -27,7 +26,6 @@ class WizardFormJuridicaSerializer(serializers.ModelSerializer):
         # fields = ('id', 'firstname', 'lastname',
         #           'email',)
         fields = '__all__'
-        read_only_fields = ('id',)
 
 
 # class WizardNaturalUpdateSerializer(serializers.ModelSerializer):
@@ -49,8 +47,7 @@ class WizardFormJuridicaSerializer(serializers.ModelSerializer):
 #         # fields = ('id', 'firstname', 'lastname',
 #         #           'email',)
 #         fields = ['status']
-#         read_only_fields = ('id',)
-
+#
 
 # class WizardJuridicaUpdateSerializer(serializers.ModelSerializer):
 #     def __init__(self, *args, **kwargs):
@@ -71,8 +68,7 @@ class WizardFormJuridicaSerializer(serializers.ModelSerializer):
 #         # fields = ('id', 'firstname', 'lastname',
 #         #           'email',)
 #         fields = ['status']
-#         read_only_fields = ('id',)
-
+#
 # class ClientsDataSerializer(serializers.ModelSerializer):
 #     def __init__(self, *args, **kwargs):
 #         many = kwargs.pop('many', True)
@@ -82,8 +78,7 @@ class WizardFormJuridicaSerializer(serializers.ModelSerializer):
 #         model = WizardForm
 #         fields = ('id', 'firstname', 'lastname',
 #                   'email', 'created_at')
-#         read_only_fields = ('id',)
-
+#
 
 # class FormImageSerializer(serializers.ModelSerializer):
 #     """Serializer for uploading images """
@@ -134,4 +129,3 @@ class EmailSerializer(serializers.ModelSerializer):
     class Meta:
         model = Email
         fields = '__all__'
-        read_only_fields = ('id',)
