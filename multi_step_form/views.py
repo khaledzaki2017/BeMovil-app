@@ -115,23 +115,20 @@ class WizardFormJuridicaListView(viewsets.ModelViewSet):
     parser_classes = (MultiPartParser, JSONParser)
 
     def create(self, request):
-        # # *******************test decode image*************************
+        # *******************test decode image*************************
         # mydata = request.data["id_image1"]
-        # # mtype = type(mydata)
-
-        # print("testttttttttttttt", mydata)
         # if type(mydata) is str:
         #     formated = img_handler(mydata)
         #     WizardFormJuridica.save( formated,save=True)
-        # # *************************************************************
+        # *************************************************************
         # else:
         wizardData = request.data
-        firstUploaded_files = request.FILES.getlist('firstFile')
-        secondUploaded_files = request.FILES.getlist('secondFile')
+        # firstUploaded_files = request.FILES.getlist('firstFile')
+        # secondUploaded_files = request.FILES.getlist('secondFile')
 
-        uploader = dict(request.data)['uploader'][0]
-        upload_handler(firstUploaded_files, uploader)
-        upload_handler(secondUploaded_files, uploader)
+        # uploader = dict(request.data)['uploader'][0]
+        # upload_handler(firstUploaded_files, uploader)
+        # upload_handler(secondUploaded_files, uploader)
 
         serializer = self.serializer_class(data=wizardData)
         if serializer.is_valid(raise_exception=True):
@@ -143,6 +140,7 @@ class WizardFormJuridicaListView(viewsets.ModelViewSet):
         else:
             return Response(serializer.errors,
                             status=status.HTTP_400_BAD_REQUEST)
+
 
 def img_handler(data):
     format, imgstr = data.split(';base64,')
@@ -190,7 +188,6 @@ def upload_handler(up_file, uploader):
 
         default_storage.save(
             f'{dest}/{f}', ContentFile(f.read()))
-
 
 
 class EmailCheck(generics.GenericAPIView):
