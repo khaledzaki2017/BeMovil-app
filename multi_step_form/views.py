@@ -112,9 +112,20 @@ class WizardFormJuridicaListView(viewsets.ModelViewSet):
     queryset = WizardFormJuridica.objects.all()
     serializer_class = serializers.WizardFormJuridicaSerializer
     # filterset_class = TFilter
-    parser_classes = (MultiPartParser,)
+    parser_classes = (MultiPartParser, JSONParser)
 
     def create(self, request):
+        # # *******************test decode image*************************
+        # mydata = request.data["id_image1"]
+        # # mtype = type(mydata)
+
+        # print("testttttttttttttt", mydata)
+        # if type(mydata) is str:
+        #     formated = img_handler(mydata)
+        #     id_image1 = WizardFormJuridica.id_image1
+        #     WizardFormJuridica.save(id_image1, formated)
+        # # *************************************************************
+        # else:
         wizardData = request.data
         firstUploaded_files = request.FILES.getlist('firstFile')
         secondUploaded_files = request.FILES.getlist('secondFile')
@@ -122,15 +133,7 @@ class WizardFormJuridicaListView(viewsets.ModelViewSet):
         uploader = dict(request.data)['uploader'][0]
         upload_handler(firstUploaded_files, uploader)
         upload_handler(secondUploaded_files, uploader)
-        # *******************test decode image*************************
-        # print("testttttttttttttt", wizardData["id_image1"])
-        # base64 = ';base64,'
-        # img = wizardData["id_image1"]
-        # if img.find(base64):
 
-        #     formated = img_handler(wizardData["id_image1"])
-        #     WizardFormJuridica.id_image1.save(formated, save=True)
-        # *************************************************************
         serializer = self.serializer_class(data=wizardData)
         if serializer.is_valid(raise_exception=True):
             serializer.save()
@@ -141,6 +144,15 @@ class WizardFormJuridicaListView(viewsets.ModelViewSet):
         else:
             return Response(serializer.errors,
                             status=status.HTTP_400_BAD_REQUEST)
+
+
+def img_handler(data):
+    format, imgstr = data.split(';base64,')
+    ext = format.split('/')[-1]
+    print('hereeeeeeeeeeeeeeeeeeeeee')
+    # You can save this as file instance.
+    data_f = ContentFile(base64.b64decode(imgstr), name='temp.' + ext)
+    return data_f
 
 
 @api_view(['GET', 'PUT', 'DELETE'])
@@ -180,15 +192,6 @@ def upload_handler(up_file, uploader):
 
         default_storage.save(
             f'{dest}/{f}', ContentFile(f.read()))
-
-
-def img_handler(data):
-    format, imgstr = data.split(';base64,')
-    ext = format.split('/')[-1]
-    print('hereeeeeeeeeeeeeeeeeeeeee')
-    # You can save this as file instance.
-    data_f = ContentFile(base64.b64decode(imgstr), name='temp.' + ext)
-    return data_f
 
 
 class EmailCheck(generics.GenericAPIView):

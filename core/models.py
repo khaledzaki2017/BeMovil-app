@@ -100,9 +100,8 @@ class WizardFormNatural(models.Model):
     # question1 = models.BooleanField(default=False)
     # question2 = models.BooleanField(default=False)
 
-
-def __str__(self):
-    return f'This is {self.firstname} {self.lastname} Form'
+    def __str__(self):
+        return f'This is {self.firstname} {self.lastname} Form'
 
 
 class WizardFormJuridica(models.Model):
@@ -168,9 +167,12 @@ class WizardFormJuridica(models.Model):
     question1 = models.BooleanField(default=False)
     question2 = models.BooleanField(default=False)
 
+    def __str__(self):
+        return f'This is {self.firstname} {self.lastname} Form'
 
-def __str__(self):
-    return f'This is {self.firstname} {self.lastname} Form'
+    def save(self, *args, **kwargs):
+        print('save() is called.')
+        super().all(*args, **kwargs)
 
 
 class phoneModel(models.Model):
