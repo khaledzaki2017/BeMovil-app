@@ -1,3 +1,6 @@
+from .sms import HablameSMS
+from BeMovileApp.settings import EMAIL_HOST_USER
+from django.core.mail import send_mail, EmailMessage
 from rest_framework.parsers import JSONParser
 from django.http.response import JsonResponse
 from rest_framework.decorators import api_view
@@ -14,7 +17,6 @@ import random
 from core.models import WizardFormJuridica, WizardFormNatural, Partner, Email
 from multi_step_form import serializers
 from drf_multiple_model.viewsets import ObjectMultipleModelAPIViewSet
-# from .serializers import  PartnerSerializer, PartnerWizardSerializer, EmailSerializer, WizardUpdateSerializer
 import os
 import django_filters
 from .utils import Util
@@ -63,12 +65,12 @@ class WizardFormNaturalListView(viewsets.ModelViewSet):
 
     def create(self, request):
         wizardData = request.data
-        firstUploaded_files = request.FILES.getlist('firstFile')
-        secondUploaded_files = request.FILES.getlist('secondFile')
+        # firstUploaded_files = request.FILES.getlist('firstFile')
+        # secondUploaded_files = request.FILES.getlist('secondFile')
 
-        uploader = dict(request.data)['uploader'][0]
-        upload_handler(firstUploaded_files, uploader)
-        upload_handler(secondUploaded_files, uploader)
+        # uploader = dict(request.data)['uploader'][0]
+        # upload_handler(firstUploaded_files, uploader)
+        # upload_handler(secondUploaded_files, uploader)
         serializer = self.serializer_class(data=wizardData)
         if serializer.is_valid(raise_exception=True):
             serializer.save()
@@ -115,13 +117,6 @@ class WizardFormJuridicaListView(viewsets.ModelViewSet):
     parser_classes = (MultiPartParser, JSONParser)
 
     def create(self, request):
-        # *******************test decode image*************************
-        # mydata = request.data["id_image1"]
-        # if type(mydata) is str:
-        #     formated = img_handler(mydata)
-        #     WizardFormJuridica.save( formated,save=True)
-        # *************************************************************
-        # else:
         wizardData = request.data
         # firstUploaded_files = request.FILES.getlist('firstFile')
         # secondUploaded_files = request.FILES.getlist('secondFile')
@@ -142,13 +137,13 @@ class WizardFormJuridicaListView(viewsets.ModelViewSet):
                             status=status.HTTP_400_BAD_REQUEST)
 
 
-def img_handler(data):
-    format, imgstr = data.split(';base64,')
-    ext = format.split('/')[-1]
-    print('hereeeeeeeeeeeeeeeeeeeeee')
-    # You can save this as file instance.
-    data_f = ContentFile(base64.b64decode(imgstr), name='temp.' + ext)
-    return data_f
+# def img_handler(data):
+#     format, imgstr = data.split(';base64,')
+#     ext = format.split('/')[-1]
+#     print('hereeeeeeeeeeeeeeeeeeeeee')
+#     # You can save this as file instance.
+#     data_f = ContentFile(base64.b64decode(imgstr), name='temp.' + ext)
+#     return data_f
 
 
 @api_view(['GET', 'PUT', 'DELETE'])
@@ -177,66 +172,69 @@ def wizardjuridica_detail(request, pk):
         return JsonResponse({'message': 'wizardjuridica was deleted successfully!'}, status=status.HTTP_204_NO_CONTENT)
 
 
-def upload_handler(up_file, uploader):
-    for f in up_file:
-        print(f)
-        dest = f'uploaded_files/{uploader}'
-        # current_site = get_current_site(request).domain
+# def upload_handler(up_file, uploader):
+#     for f in up_file:
+#         print(f)
+#         dest = f'uploaded_files/{uploader}'
+#         # current_site = get_current_site(request).domain
 
-        if not os.path.exists(dest):
-            os.makedirs(dest)
+#         if not os.path.exists(dest):
+#             os.makedirs(dest)
 
-        default_storage.save(
-            f'{dest}/{f}', ContentFile(f.read()))
+#         default_storage.save(
+#             f'{dest}/{f}', ContentFile(f.read()))
 
 
 class EmailCheck(generics.GenericAPIView):
 
     queryset = Email.objects.all()
     serializer_class = serializers.EmailSerializer
-    # filterset_class = TFilter
-    # parser_classes = (MultiPartParser,)
-
-    # def list(self, request):
-    #     if (request.data['_type'] == "Juridica"):
-    #         email = self.request.query_params.get('email', None)
-    #         partner=Partner.objects.filter(main=email)
-
-    #     return Response(serializer.data)
 
     def post(self, request):
-        # wizardData = request.data
-        fulldata = self.request.data
+        if (request):
+            client_name = request.POST.get('firstname', '')
+            mail_id = request.POST.get('email', '')
+            email = EmailMessage("[Be-Movil]Check Your Contract Informations", "Hello, "+client_name +
+                                 "Please, check your data in the file attached below\n", EMAIL_HOST_USER, [mail_id])
+            email.content_subtype = 'html'
 
-        serializer = self.serializer_class(data=fulldata)
-        if serializer.is_valid(raise_exception=True):
-            serializer.save()
-        # wizard_data = serializer.data
-        if(fulldata):
-            print(fulldata)
-            client_email = fulldata['email']
-            print(client_email)
-            client_name = fulldata['firstname']
-            print(client_name)
-            current_site = get_current_site(request).domain
-            # final_pdf = self.request.FILES['final_pdf'].file.name
-            # content = final_pdf.read()  # For small files
+            file = request.FILES['final_pdf']
+            email.attach(file.name, file.read(), file.content_type)
 
-            # relativeLink = reverse('multi_step_form:email-check')
-            # absurl = 'http://' + current_site + content
-            email_body = "Hello, "+client_name + \
-                " check yor data in the file below\n"
-            print(email_body)
-            data = {'email_body': email_body, 'to_email': [client_email],
-                    'email_subject': 'check your data'}
-            print(data)
-            Util.send_email(data)
-
+            email.send()
             return Response("Email sent successfully ",
                             status=status.HTTP_201_CREATED)
         else:
             return Response("try again!, something wrong",
                             status=status.HTTP_400_BAD_REQUEST)
+
+    # def post(self, request):
+        # wizardData = request.data
+        # fulldata = self.request.data
+
+        # serializer = self.serializer_class(data=fulldata)
+        # if serializer.is_valid(raise_exception=True):
+        #     serializer.save()
+        # # wizard_data = serializer.data
+        # if(fulldata):
+            # print(fulldata)
+            # client_email = fulldata['email']
+            # print(client_email)
+            # client_name = fulldata['firstname']
+            # print(client_name)
+            # current_site = get_current_site(request).domain
+            # # final_pdf = self.request.FILES['final_pdf'].file.name
+            # # content = final_pdf.read()  # For small files
+
+            # # relativeLink = reverse('multi_step_form:email-check')
+            # # absurl = 'http://' + current_site + content
+            # email_body = "Hello, "+client_name + \
+            #     " check yor data in the file below\n"
+            # print(email_body)
+            # data = {'email_body': email_body, 'to_email': [client_email],
+            #         'email_subject': 'check your data'}
+            # print(data)
+            # Util.send_email(data)
 
 
 class generateKey:
@@ -257,7 +255,7 @@ class getPhoneNumberRegistered(APIView):
                 Mobile=phone,
             )
             Mobile = phoneModel.objects.get(
-                Mobile=phone)  # user Newly created Model
+                Mobile=phone)
         Mobile.counter += 1  # Update Counter At every Call
         Mobile.save()  # Save the data
         keygen = generateKey()
@@ -265,8 +263,10 @@ class getPhoneNumberRegistered(APIView):
             phone).encode())  # Key is generated
         OTP = pyotp.HOTP(key)  # HOTP Model for OTP is created
         print(OTP.at(Mobile.counter))
-        # Using Multi-Threading send the OTP Using Messaging Services like Twilio or Fast2sms
-        # Just for demonstration
+        # need IP Auth
+        HablameSMS(
+            f'{phone}', f'This is your OTP CODE{OTP.at(Mobile.counter)}').recharge()
+        # just for testing
         return Response({"OTP": OTP.at(Mobile.counter)}, status=200)
 
     # This Method verifies the OTP
@@ -288,149 +288,6 @@ class getPhoneNumberRegistered(APIView):
         return Response("OTP is wrong", status=400)
 
 
-# class Authentication(authentication.BaseAuthentication):
-#     def authenticate(self, request):
-#         auth = authentication.get_authorization_header(request)
-#         print("here", auth)
-#         if not auth or auth[0].lower() != b'token':
-#             return None
-
-#         if len(auth) == 1:
-#             msg = _('Invalid token header. No credentials provided.')
-#             raise exceptions.AuthenticationFailed(msg)
-#         elif len(auth) > 2:
-#             msg = _(
-#                 'Invalid token header. Credentials string should not contain spaces.')
-#             raise exceptions.AuthenticationFailed(msg)
-
-#         try:
-#             token = Token.objects.get(token=auth[1])
-#             print(token.key)
-
-#         except Token.DoesNotExist:
-#             raise exceptions.AuthenticationFailed('No such token')
-
-#         return (AnonymousUser(), token)
-
-
-# ********************FILE VIEWS******************************
-
-# class FileView(APIView):
-#     parser_classes = (MultiPartParser,)
-#     queryset = WizardForm.objects.values("firstFile", "secondFile", "uploader")
-#     serializer_class = serializers.FileSerilizer
-
-#     def post(self, request, *args, **kwargs):
-#         firstUploaded_files = request.FILES.getlist('firstFile')
-#         secondUploaded_files = request.FILES.getlist('secondFile')
-
-#         uploader = dict(request.data)['uploader'][0]
-#         upload_handler(firstUploaded_files, uploader, request)
-#         upload_handler(secondUploaded_files, uploader, request)
-#         file_serializer = FileSerilizer(data=request.data)
-
-#         if file_serializer.is_valid():
-#             file_serializer.save()
-#             return Response(file_serializer.data, status=status.HTTP_201_CREATED)
-#         else:
-#             return Response(file_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
-# def upload_handler(up_file, uploader, request):
-#     for f in up_file:
-#         print(f)
-#         dest = f'uploaded_files/{uploader}'
-#         # current_site = get_current_site(request).domain
-
-#         if not os.path.exists(dest):
-#             os.makedirs(dest)
-
-#         default_storage.save(
-#             f'{dest}/{f}', ContentFile(f.read()))
-
-# class FileView(APIView):
-#     # authentication_classes = (Authentication,)
-#     # parser_classes = (MultiPartParser, FormParser,)
-#     # parser_classes = [FileUploadParser]
-#     parser_classes = (MultiPartParser, FileUploadParser)
-
-#     # queryset = FileModel.objects.all()
-#     serializer_class = FileSerilizer
-#     # queryset = WizardForm.objects.values("firstFile", "secondFile")
-#     serializer_class = serializers.FileSerilizer
-
-#     def post(self, request, *args, **kwargs):
-#         files_list = request.FILES
-#         data = request.data
-#         return Response(data={"files": "{} files uploaded".format(len(files_list)),
-#                               "data": "{} data included".format(len(data))})
-#         # firstUploaded_files = request.FILES.getlist('firstFile')
-#         # secondUploaded_files = request.FILES.getlist('secondFile')
-#         # firstUploaded_files = request.data['file']
-#         # secondUploaded_files = request.data['file']
-
-#         # file_serializer = FileSerilizer(data=request.data)
-#         # if file_serializer.is_valid():
-#         #     file_serializer.save()
-#         #     return Response(file_serializer.data, status=status.HTTP_201_CREATED)
-#         # else:
-#         #     return Response(file_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
-# def upload_handler(up_file, uploader):
-#     for f in up_file:
-#         dest = f'uploaded_files/{uploader}'
-#         if not os.path.exists(dest):
-#             os.makedirs(dest)
-#         FileSystemStorage.save(f'{dest}/{f}', ContentFile(f.read()))
-
-
-# class FileView(APIView):
-#     # authentication_classes = (Authentication,)
-#     parser_classes = (MultiPartParser, FormParser,)
-#     queryset = WizardForm.objects.values("firstFile", "secondFile", "uploader")
-#     serializer_class = serializers.FileSerilizer
-
-#     def post(self, request, *args, **kwargs):
-#         firstUploaded_files = request.FILES.getlist('firstFile')
-#         secondUploaded_files = request.FILES.getlist('secondFile')
-
-#         uploader = dict(request.data)['uploader'][0]
-#         upload_handler(firstUploaded_files, uploader)
-#         upload_handler(secondUploaded_files, uploader)
-#         file_serializer = FileSerilizer(data=request.data)
-#         if file_serializer.is_valid():
-#             file_serializer.save()
-#             return Response(file_serializer.data, status=status.HTTP_201_CREATED)
-#         else:
-#             return Response(file_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
-#     def get(self, request, pk=None):
-#         queryset = WizardForm.objects.values(
-#             "firstFile", "secondFile", "uploader")
-#         serializer_class = serializers.FileSerilizer()
-#         return Response(serializer_class.data)
-
-
-# class FileViewlist(APIView):
-#     # authentication_classes = (Authentication,)
-
-#     def get(self, request):
-#         queryset = WizardForm.objects.values("firstFile", "secondFile")
-#         serializer = serializers.FileSerilizer(queryset, many=True)
-
-#         return Response(serializer.data)
-
-
-# class FileDetail(RetrieveAPIView):
-#     # authentication_classes = (Authentication,)
-
-#     def get(self, request, pk=None):
-#         queryset = WizardForm.objects.values("firstFile", "secondFile")
-#         serializer_class = serializers.FileSerilizer()
-#         return Response(serializer_class.data)
-
 # *************************FULL WIZARD DATA ********************************
 
 
@@ -445,14 +302,7 @@ class WizardFormViewSet(ObjectMultipleModelAPIViewSet):
         ), 'serializer_class': serializers.PartnerSerializer}
     ]
 
-# *********************************************************************
-
-
-# class ClientDataView(viewsets.ModelViewSet):
-
-#     queryset = WizardForm.objects.values('firstname', 'lastname',
-#                                          'email', 'created_at')
-#     serializer_class = serializers.ClientsDataSerializer()
+# ***************************** Partner View ****************************************
 
 
 class PartnerMainWizardFilter(django_filters.FilterSet):
@@ -462,19 +312,6 @@ class PartnerMainWizardFilter(django_filters.FilterSet):
         model = Partner
         fields = ['main']
 
-
-# class PartnerMainWizardListAPIView(ListAPIView):
-#
-#     serializer_class = PartnerWizardSerializer
-#
-#     def get_queryset(self):
-#         queryset = Partner.objects.all()
-#         main = self.request.query_params.get("main", None)
-#         print(main)
-#         if main is not None:
-#             queryset = queryset.filter(WizardForm__icontains=main)
-#         return queryset
-#
 
 class PartnerMainWizardListAPIView(ListAPIView):
 
