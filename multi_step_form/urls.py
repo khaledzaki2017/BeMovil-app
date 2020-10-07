@@ -27,7 +27,7 @@ urlpatterns = [
 
     path("verify/<phone>/", views.getPhoneNumberRegistered.as_view(), name="OTP Gen"),
     path('email-check/', views.EmailCheck.as_view()),
-    path('partner/', views.PartnerView.as_view()),
+    path('partner/', views.PartnerView.as_view({'post': 'create'})),
     path('partnerlist/', views.PartnerMainWizardListAPIView.as_view()),
 
 ]

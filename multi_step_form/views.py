@@ -1,3 +1,4 @@
+from rest_framework import mixins
 from .sms import HablameSMS
 from BeMovileApp.settings import EMAIL_HOST_USER
 from django.core.mail import send_mail, EmailMessage
@@ -320,28 +321,48 @@ class PartnerMainWizardListAPIView(ListAPIView):
     filter_class = PartnerMainWizardFilter
 
 
-class PartnerView(APIView):
+# class PartnerView(APIView):
+#     queryset = Partner.objects.all()
+#     serializer_class = serializers.PartnerSerializer
+
+#     def post(self, request, *args, **kwargs):
+#         print(request.data)
+#         PartnerData = request.data
+#         serializer = self.serializer_class(data=PartnerData)
+#         if serializer.is_valid(raise_exception=True):
+#             serializer.save()
+#             # partner_data = serializer.data.filter(
+#             #     email=self.request.data.main)
+#             return Response(serializer.data,
+#                             status=status.HTTP_201_CREATED)
+#         else:
+#             return Response(serializer.errors,
+#                             status=status.HTTP_400_BAD_REQUEST)
+
+#     def get(self, request, *args, **kwargs):
+#         queryset = Partner.objects.all()
+#         serializer_class = serializers.PartnerSerializer()
+#         return Response(serializer_class.data)
+
+
+class PartnerView(mixins.CreateModelMixin, mixins.ListModelMixin, viewsets.GenericViewSet):
+    """
+    ViewSet create and list partner
+    """
     queryset = Partner.objects.all()
     serializer_class = serializers.PartnerSerializer
+    # search_fields = ('name','author')
 
-    def post(self, request, *args, **kwargs):
-        print(request.data)
-        PartnerData = request.data
-        serializer = self.serializer_class(data=PartnerData)
-        if serializer.is_valid(raise_exception=True):
-            serializer.save()
-            # partner_data = serializer.data.filter(
-            #     email=self.request.data.main)
-            return Response(serializer.data,
-                            status=status.HTTP_201_CREATED)
+    def create(self, request, *args, **kwargs):
+
+        is_many = isinstance(request.data, list)
+        if not is_many:
+            return super(PartnerView, self).create(request, *args, **kwargs)
         else:
-            return Response(serializer.errors,
-                            status=status.HTTP_400_BAD_REQUEST)
-
-    def get(self, request, *args, **kwargs):
-        queryset = Partner.objects.all()
-        serializer_class = serializers.PartnerSerializer()
-        return Response(serializer_class.data)
-
+            serializer = self.get_serializer(data=request.data, many=True)
+            serializer.is_valid(raise_exception=True)
+            self.perform_create(serializer)
+            headers = self.get_success_headers(serializer.data)
+            return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
 # ********************************************************************************************************
