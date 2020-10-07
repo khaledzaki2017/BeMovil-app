@@ -222,7 +222,8 @@ class Email(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     email = models.EmailField(null=True)
     firstname = models.CharField(null=True, max_length=100)
-    url = models.URLField(null=True)
+    # url = models.URLField(null=True)
+    final_pdf = models.FileField(upload_to='documents', default="")
     date = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):

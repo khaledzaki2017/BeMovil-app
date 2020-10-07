@@ -206,11 +206,12 @@ class EmailCheck(generics.GenericAPIView):
 
     def post(self, request):
         # wizardData = request.data
-        # serializer = self.serializer_class(data=wizardData)
-        # # if serializer.is_valid(raise_exception=True):
-        # #     serializer.save()
-        # wizard_data = serializer.data
         fulldata = self.request.data
+
+        serializer = self.serializer_class(data=fulldata)
+        if serializer.is_valid(raise_exception=True):
+            serializer.save()
+        # wizard_data = serializer.data
         if(fulldata):
             print(fulldata)
             client_email = fulldata['email']
@@ -218,12 +219,13 @@ class EmailCheck(generics.GenericAPIView):
             client_name = fulldata['firstname']
             print(client_name)
             current_site = get_current_site(request).domain
-            pdf_url = fulldata['url']
-            print(pdf_url)
+            # final_pdf = self.request.FILES['final_pdf'].file.name
+            # content = final_pdf.read()  # For small files
+
             # relativeLink = reverse('multi_step_form:email-check')
-            absurl = 'http://' + current_site + pdf_url
+            # absurl = 'http://' + current_site + content
             email_body = "Hello, "+client_name + \
-                " check yor data in the file below\n" + absurl
+                " check yor data in the file below\n"
             print(email_body)
             data = {'email_body': email_body, 'to_email': [client_email],
                     'email_subject': 'check your data'}
