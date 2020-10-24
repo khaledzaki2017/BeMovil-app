@@ -9,13 +9,19 @@ class WizardFormNaturalSerializer(serializers.ModelSerializer):
         super(WizardFormNaturalSerializer, self).__init__(
             many=many, *args, **kwargs)
 
-    firstFile = serializers.FileField(required=False, allow_null=True)
+    firstFile = serializers.FileField(
+        required=False, allow_empty_file=True, allow_null=True)
 
     class Meta:
         model = WizardFormNatural
         # fields = ('id', 'firstname', 'lastname',
         #           'email',)
         fields = '__all__'
+
+    def get_validation_exclusions(self, *args, **kwargs):
+        exclusions = super(WizardFormNaturalSerializer,
+                           self).get_validation_exclusions()
+        return exclusions + ['firstFile']
 
 
 class WizardFormJuridicaSerializer(serializers.ModelSerializer):
@@ -24,7 +30,9 @@ class WizardFormJuridicaSerializer(serializers.ModelSerializer):
         super(WizardFormJuridicaSerializer, self).__init__(
             many=many, *args, **kwargs)
     # id_image1 = Base64ImageField()
-    firstFile = serializers.FileField(required=False, allow_null=True)
+
+    firstFile = serializers.FileField(
+        required=False, allow_empty_file=True, allow_null=True)
 
     class Meta:
         model = WizardFormJuridica
@@ -32,10 +40,10 @@ class WizardFormJuridicaSerializer(serializers.ModelSerializer):
         #           'email',)
         fields = '__all__'
 
-        # def create(self, validated_data):
-        #     id_image1 = validated_data.pop('id_image1')
-        #     # data = validated_data.pop('data')
-        #     return WizardFormJuridica.objects.create(id_image1=id_image1)
+    def get_validation_exclusions(self, *args, **kwargs):
+        exclusions = super(WizardFormJuridicaSerializer,
+                           self).get_validation_exclusions()
+        return exclusions + ['firstFile']
 
 
 class PartnerSerializer(serializers.ModelSerializer):

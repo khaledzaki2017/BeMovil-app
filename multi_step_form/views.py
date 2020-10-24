@@ -65,7 +65,8 @@ class WizardFormNaturalListView(viewsets.ModelViewSet):
     queryset = WizardFormNatural.objects.all()
     serializer_class = serializers.WizardFormNaturalSerializer
     # filterset_class = TFilter
-    parser_classes = (MultiPartParser,)
+    parser_classes = [MultiPartParser,
+                      FileUploadParser, FormParser, JSONParser]
 
     def create(self, request):
         files_list = request.FILES
@@ -125,7 +126,8 @@ class WizardFormJuridicaListView(viewsets.ModelViewSet):
     queryset = WizardFormJuridica.objects.all()
     serializer_class = serializers.WizardFormJuridicaSerializer
     # filterset_class = TFilter
-    parser_classes = (MultiPartParser, JSONParser)
+    parser_classes = [MultiPartParser,
+                      FileUploadParser, FormParser, JSONParser]
 
     def create(self, request):
         files_list = request.FILES
