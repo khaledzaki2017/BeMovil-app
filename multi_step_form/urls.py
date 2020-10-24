@@ -29,5 +29,6 @@ urlpatterns = [
     path('email-check/', views.EmailCheck.as_view()),
     path('partner/', views.PartnerView.as_view({'post': 'create'})),
     path('partnerlist/', views.PartnerMainWizardListAPIView.as_view()),
+    path('generate_token/', views.generate_token)
 
 ]

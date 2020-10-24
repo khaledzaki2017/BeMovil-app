@@ -17,6 +17,8 @@ from rest_framework_simplejwt.views import (
     TokenObtainPairView,
     TokenRefreshView,
 )
+import debug_toolbar
+
 from rest_framework_swagger.views import get_swagger_view
 from django.conf import settings
 from django.contrib import admin
@@ -27,6 +29,8 @@ from django.conf.urls.static import static
 schema_view = get_swagger_view(title='App APIs')
 
 urlpatterns = [
+    path('__debug__/', include(debug_toolbar.urls)),
+
     path('admin/', admin.site.urls),
     path('api/', include('multi_step_form.urls')),
     # path('adminpanel/', include('adminpanel.urls')),

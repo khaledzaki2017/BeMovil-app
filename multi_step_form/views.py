@@ -1,10 +1,11 @@
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework import mixins
 from .sms import HablameSMS
 from BeMovileApp.settings import EMAIL_HOST_USER
 from django.core.mail import send_mail, EmailMessage
 from rest_framework.parsers import JSONParser
 from django.http.response import JsonResponse
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes
 from django.core.files.base import ContentFile
 from rest_framework import status
 from rest_framework.parsers import FileUploadParser
@@ -27,6 +28,7 @@ from django.contrib.auth.models import AnonymousUser
 from django_filters import rest_framework as filters
 from django.http import HttpResponse
 from django.core.files.storage import default_storage
+from django.views.decorators.csrf import csrf_exempt
 
 # ******************Rest_Framework Imports******************************
 from rest_framework import generics
@@ -40,13 +42,14 @@ from rest_framework.generics import (
     RetrieveAPIView, DestroyAPIView
 )
 from rest_framework.authentication import TokenAuthentication
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework import viewsets, status
 from rest_framework.views import APIView
 from rest_framework.parsers import MultiPartParser, FormParser
-
-
+import logging
+logger = logging.getLogger('django')
 # **************************************************************************************
 # class TFilter(filters.FilterSet):
 
@@ -65,6 +68,7 @@ class WizardFormNaturalListView(viewsets.ModelViewSet):
     parser_classes = (MultiPartParser,)
 
     def create(self, request):
+        files_list = request.FILES
         wizardData = request.data
         # firstUploaded_files = request.FILES.getlist('firstFile')
         # secondUploaded_files = request.FILES.getlist('secondFile')
@@ -72,23 +76,28 @@ class WizardFormNaturalListView(viewsets.ModelViewSet):
         # uploader = dict(request.data)['uploader'][0]
         # upload_handler(firstUploaded_files, uploader)
         # upload_handler(secondUploaded_files, uploader)
-        serializer = self.serializer_class(data=wizardData)
+        serializer = self.serializer_class(
+            data={"data": wizardData, "files": files_list})
         if serializer.is_valid(raise_exception=True):
             serializer.save()
             wizard_data = serializer.data
-
+            logger.info("created view of WizardFormNaturalListView")
             return Response(wizard_data,
                             status=status.HTTP_201_CREATED)
         else:
+            logger.error('Something went wrong in WizardFormNaturalListView !')
             return Response(serializer.errors,
                             status=status.HTTP_400_BAD_REQUEST)
 
 
+@csrf_exempt
 @api_view(['GET', 'PUT', 'DELETE'])
 def wizardnatural_detail(request, pk):
     try:
         wizardnatural = WizardFormNatural.objects.get(pk=pk)
     except WizardFormNatural.DoesNotExist:
+        logger.error('Something went wrong in wizardnatural_detail !')
+
         return JsonResponse({'message': 'The WizardFormNatural does not exist'}, status=status.HTTP_404_NOT_FOUND)
 
     if request.method == 'GET':
@@ -103,6 +112,7 @@ def wizardnatural_detail(request, pk):
         if WizardFormNatural_serializer.is_valid():
             WizardFormNatural_serializer.save()
             return Response(WizardFormNatural_serializer.data)
+        logger.error('Something went wrong in wizardnatural_detail !')
         return JsonResponse(WizardFormNatural_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     elif request.method == 'DELETE':
@@ -118,6 +128,7 @@ class WizardFormJuridicaListView(viewsets.ModelViewSet):
     parser_classes = (MultiPartParser, JSONParser)
 
     def create(self, request):
+        files_list = request.FILES
         wizardData = request.data
         # firstUploaded_files = request.FILES.getlist('firstFile')
         # secondUploaded_files = request.FILES.getlist('secondFile')
@@ -126,7 +137,8 @@ class WizardFormJuridicaListView(viewsets.ModelViewSet):
         # upload_handler(firstUploaded_files, uploader)
         # upload_handler(secondUploaded_files, uploader)
 
-        serializer = self.serializer_class(data=wizardData)
+        serializer = self.serializer_class(
+            data={"data": wizardData, "files": files_list})
         if serializer.is_valid(raise_exception=True):
             serializer.save()
             wizard_data = serializer.data
@@ -134,6 +146,7 @@ class WizardFormJuridicaListView(viewsets.ModelViewSet):
             return Response(wizard_data,
                             status=status.HTTP_201_CREATED)
         else:
+            logger.error('Something went wrong in WizardFormJuridicaListView')
             return Response(serializer.errors,
                             status=status.HTTP_400_BAD_REQUEST)
 
@@ -146,7 +159,7 @@ class WizardFormJuridicaListView(viewsets.ModelViewSet):
 #     data_f = ContentFile(base64.b64decode(imgstr), name='temp.' + ext)
 #     return data_f
 
-
+@csrf_exempt
 @api_view(['GET', 'PUT', 'DELETE'])
 def wizardjuridica_detail(request, pk):
     try:
@@ -245,6 +258,8 @@ class generateKey:
 
 
 class getPhoneNumberRegistered(APIView):
+    # authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
     # Get to Create a call for OTP
     @staticmethod
     def get(request, phone):
@@ -366,3 +381,11 @@ class PartnerView(mixins.CreateModelMixin, mixins.ListModelMixin, viewsets.Gener
             return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
 # ********************************************************************************************************
+@api_view(['POST'])
+def generate_token(request):
+    if request.method == 'POST':
+        serializer = serializers.AuthTokenSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

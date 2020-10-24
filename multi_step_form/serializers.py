@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from core.models import WizardFormJuridica, WizardFormNatural, Partner, Email
+from core.models import WizardFormJuridica, WizardFormNatural, Partner, Email, phoneModel, AuthToken
 # from drf_extra_fields.fields import Base64ImageField
 
 
@@ -8,6 +8,8 @@ class WizardFormNaturalSerializer(serializers.ModelSerializer):
         many = kwargs.pop('many', True)
         super(WizardFormNaturalSerializer, self).__init__(
             many=many, *args, **kwargs)
+
+    firstFile = serializers.FileField(required=False, allow_null=True)
 
     class Meta:
         model = WizardFormNatural
@@ -22,6 +24,7 @@ class WizardFormJuridicaSerializer(serializers.ModelSerializer):
         super(WizardFormJuridicaSerializer, self).__init__(
             many=many, *args, **kwargs)
     # id_image1 = Base64ImageField()
+    firstFile = serializers.FileField(required=False, allow_null=True)
 
     class Meta:
         model = WizardFormJuridica
@@ -63,3 +66,19 @@ class EmailSerializer(serializers.ModelSerializer):
     class Meta:
         model = Email
         fields = '__all__'
+
+
+class AuthTokenSerializer(serializers.ModelSerializer):
+    id = serializers.PrimaryKeyRelatedField(
+        queryset=phoneModel.objects.all(), write_only=True)
+
+    class Meta:
+        model = AuthToken
+        fields = ('key', 'created', 'id')
+        read_only_fields = ('key', 'created')
+
+    def create(self, validated_data):
+
+        validated_data.pop('id')
+
+        return super().create(validated_data)

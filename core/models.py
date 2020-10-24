@@ -1,3 +1,5 @@
+import os
+import binascii
 from django.utils.translation import ugettext_lazy as _
 from django.contrib.auth.models import AbstractUser
 from django.db import models
@@ -11,6 +13,7 @@ from django.conf import settings
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from rest_framework.authtoken.models import Token
+from multi_step_form.validators import validate_file_extension
 
 # from sortedone2many.fields import SortedOneToManyField
 from multiselectfield import MultiSelectField
@@ -76,8 +79,8 @@ class WizardFormNatural(models.Model):
     # ****************************step4************************************
 
     uploader = models.CharField(max_length=250, null=True, default="")
-    firstFile = models.FileField(upload_to='documents', default="")
-    secondFile = models.FileField(upload_to='documents', default="")
+    firstFile = models.FileField(upload_to='documents',blank=True,validators=[validate_file_extension], null=True)
+    secondFile = models.FileField(upload_to='documents',blank=True,validators=[validate_file_extension], null=True)
     # ****************************step5************************************
 
     name_info = models.CharField(max_length=250, null=True)
@@ -85,12 +88,12 @@ class WizardFormNatural(models.Model):
     lastname_info = models.CharField(max_length=250, null=True)
     number_info = models.IntegerField(null=True)
 
-    id_image1 = models.ImageField(upload_to='user_images/id_images', null=True)
-    id_image2 = models.ImageField(upload_to='user_images/id_images', null=True)
+    id_image1 = models.ImageField(upload_to='user_images/id_images',blank=True,validators=[validate_file_extension], null=True)
+    id_image2 = models.ImageField(upload_to='user_images/id_images',blank=True,validators=[validate_file_extension], null=True)
 
-    client_image1 = models.ImageField(upload_to='user_images/', null=True)
-    client_image2 = models.ImageField(upload_to='user_images/', null=True)
-    client_image3 = models.ImageField(upload_to='user_images/', null=True)
+    client_image1 = models.ImageField(upload_to='user_images/',blank=True,validators=[validate_file_extension], null=True)
+    client_image2 = models.ImageField(upload_to='user_images/',blank=True,validators=[validate_file_extension], null=True)
+    client_image3 = models.ImageField(upload_to='user_images/', blank=True,validators=[validate_file_extension],null=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     status = models.BooleanField(default=False)
@@ -143,8 +146,8 @@ class WizardFormJuridica(models.Model):
     # ****************************step4************************************
 
     uploader = models.CharField(max_length=250, null=True, default="")
-    firstFile = models.FileField(upload_to='documents', default="")
-    secondFile = models.FileField(upload_to='documents', default="")
+    firstFile = models.FileField(upload_to='documents',blank=True,validators=[validate_file_extension],null=True)
+    secondFile = models.FileField(upload_to='documents', blank=True,validators=[validate_file_extension],null=True)
     # ****************************step5************************************
 
     name_info = models.CharField(max_length=250, null=True)
@@ -152,12 +155,12 @@ class WizardFormJuridica(models.Model):
     lastname_info = models.CharField(max_length=250, null=True)
     number_info = models.IntegerField(null=True)
 
-    id_image1 = models.ImageField(upload_to='user_images/id_images', null=True)
-    id_image2 = models.ImageField(upload_to='user_images/id_images', null=True)
+    id_image1 = models.ImageField(upload_to='user_images/id_images', blank=True,validators=[validate_file_extension],null=True)
+    id_image2 = models.ImageField(upload_to='user_images/id_images', blank=True,validators=[validate_file_extension],null=True)
 
-    client_image1 = models.ImageField(upload_to='user_images/', null=True)
-    client_image2 = models.ImageField(upload_to='user_images/', null=True)
-    client_image3 = models.ImageField(upload_to='user_images/', null=True)
+    client_image1 = models.ImageField(upload_to='user_images/',blank=True,validators=[validate_file_extension], null=True)
+    client_image2 = models.ImageField(upload_to='user_images/',blank=True,validators=[validate_file_extension], null=True)
+    client_image3 = models.ImageField(upload_to='user_images/',blank=True,validators=[validate_file_extension], null=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     status = models.BooleanField(default=False)
@@ -228,3 +231,24 @@ class Email(models.Model):
 
     def __str__(self):
         return str(self.email)
+
+
+class AuthToken(models.Model):
+    key = models.CharField(verbose_name='Key', max_length=40, primary_key=True)
+    created = models.DateTimeField(
+        verbose_name='Creation date', auto_now_add=True)
+
+    class Meta:
+        verbose_name = 'Token'
+        verbose_name_plural = 'Tokens'
+
+    def save(self, *args, **kwargs):
+        if not self.key:
+            self.key = self.generate_key()
+        return super().save(*args, **kwargs)
+
+    def generate_key(self):
+        return binascii.hexlify(os.urandom(20)).decode()
+
+    def __str__(self):
+        return self.key
