@@ -71,8 +71,6 @@ class WizardFormNaturalListView(viewsets.ModelViewSet):
     def create(self, request):
         files_list = request.FILES
         wizardData = request.data
-        if request.FILES.getlist('firstFile') == null:
-            print("firstFile is null")
 
         serializer = self.serializer_class(
             data={"data": wizardData, "files": files_list})
@@ -130,8 +128,6 @@ class WizardFormJuridicaListView(viewsets.ModelViewSet):
     def create(self, request):
         files_list = request.FILES
         wizardData = request.data
-        if request.FILES.getlist('firstFile') == null:
-            print("firstFile is null")
 
         serializer = self.serializer_class(
             data={"data": wizardData, "files": files_list})
