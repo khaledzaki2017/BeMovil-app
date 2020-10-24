@@ -1,5 +1,3 @@
-import os
-import binascii
 from django.utils.translation import ugettext_lazy as _
 from django.contrib.auth.models import AbstractUser
 from django.db import models
@@ -13,10 +11,10 @@ from django.conf import settings
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from rest_framework.authtoken.models import Token
-from multi_step_form.validators import validate_file_extension
 
 # from sortedone2many.fields import SortedOneToManyField
 from multiselectfield import MultiSelectField
+from multi_step_form.validators import validate_file_extension
 
 # @receiver(post_save, sender=settings.AUTH_USER_MODEL)
 # def create_auth_token(sender, instance=None, created=False, **kwargs):
@@ -27,9 +25,9 @@ from multiselectfield import MultiSelectField
 # Create your models here.
 
 # class Client(models.Model):
-#     bemovil_id = models.IntegerField(null=True, primary_key=True)
+#     bemovil_id = models.CharField(null=True, primary_key=True)
 #     email = models.EmailField(max_length=255, null=True)
-#     mobile_phone = models.IntegerField(null=True)
+#     mobile_phone = models.CharField(max_length=250, null=True)
 
 
 #     def __str__(self):
@@ -51,10 +49,10 @@ class WizardFormNatural(models.Model):
     personal_id = models.TextField(max_length=250, null=True)
     firstname = models.CharField(max_length=250, null=True)
     lastname = models.CharField(max_length=250, null=True)
-    bemovil_id = models.IntegerField(null=True)
+    bemovil_id = models.CharField(max_length=250, null=True)
     expedition_date = models.DateField(null=True)
     expedition_place = models.CharField(max_length=250, null=True)
-    mobile_phone = models.IntegerField(null=True)
+    mobile_phone = models.CharField(max_length=250, null=True)
     number = models.CharField(max_length=250, null=True)
 
     address = models.TextField(max_length=250, null=True)
@@ -68,39 +66,39 @@ class WizardFormNatural(models.Model):
     barrio = models.CharField(max_length=250, null=True)
     ciudad = models.CharField(max_length=250, null=True)
     departamento = models.CharField(max_length=250, null=True)
-    mobile_phone_fin = models.IntegerField(null=True)
+    mobile_phone_fin = models.CharField(max_length=250, null=True)
     email_fin = models.EmailField(null=True, default="")
 
-    telefono_fijo = models.IntegerField(blank=True, null=True)
-    ingresos = models.IntegerField(blank=True, null=True)
-    total_activos = models.IntegerField(blank=True, null=True)
-    egresos = models.IntegerField(blank=True, null=True)
-    total_pasivos = models.IntegerField(blank=True, null=True)
+    # telefono_fijo = models.CharField(max_length=250, null=True)
+    ingresos = models.CharField(max_length=250, null=True)
+    total_activos = models.CharField(max_length=250, null=True)
+    egresos = models.CharField(max_length=250, null=True)
+    total_pasivos = models.CharField(max_length=250, null=True)
     # ****************************step4************************************
 
     uploader = models.CharField(max_length=250, null=True, default="")
-    firstFile = models.FileField(upload_to='documents', blank=True, validators=[
-                                 validate_file_extension], null=True)
-    secondFile = models.FileField(upload_to='documents', blank=True, validators=[
-                                  validate_file_extension], null=True)
+    firstFile = models.FileField(
+        upload_to='documents', null=True, blank=True, validators=[validate_file_extension])
+    secondFile = models.FileField(
+        upload_to='documents', null=True, blank=True, validators=[validate_file_extension])
     # ****************************step5************************************
 
     name_info = models.CharField(max_length=250, null=True)
     email_info = models.EmailField(null=True, default="")
     lastname_info = models.CharField(max_length=250, null=True)
-    number_info = models.IntegerField(null=True)
+    number_info = models.CharField(max_length=250, null=True)
 
-    id_image1 = models.ImageField(upload_to='user_images/id_images',
-                                  blank=True, validators=[validate_file_extension], null=True)
-    id_image2 = models.ImageField(upload_to='user_images/id_images',
-                                  blank=True, validators=[validate_file_extension], null=True)
+    id_image1 = models.ImageField(
+        upload_to='user_images/id_images', null=True, validators=[validate_file_extension])
+    id_image2 = models.ImageField(
+        upload_to='user_images/id_images', null=True, validators=[validate_file_extension])
 
     client_image1 = models.ImageField(
-        upload_to='user_images/', blank=True, validators=[validate_file_extension], null=True)
+        upload_to='user_images/', null=True, validators=[validate_file_extension])
     client_image2 = models.ImageField(
-        upload_to='user_images/', blank=True, validators=[validate_file_extension], null=True)
+        upload_to='user_images/', null=True, validators=[validate_file_extension])
     client_image3 = models.ImageField(
-        upload_to='user_images/', blank=True, validators=[validate_file_extension], null=True)
+        upload_to='user_images/', null=True, validators=[validate_file_extension])
     created_at = models.DateTimeField(auto_now_add=True)
 
     status = models.BooleanField(default=False)
@@ -125,10 +123,10 @@ class WizardFormJuridica(models.Model):
     personal_id = models.TextField(max_length=250, null=True)
     firstname = models.CharField(max_length=250, null=True)
     lastname = models.CharField(max_length=250, null=True)
-    bemovil_id = models.IntegerField(null=True)
+    bemovil_id = models.CharField(max_length=250, null=True)
     expedition_date = models.DateField(null=True)
     expedition_place = models.CharField(max_length=250, null=True)
-    mobile_phone = models.IntegerField(null=True)
+    mobile_phone = models.CharField(max_length=250, null=True)
     number = models.CharField(max_length=250, null=True)
 
     address = models.TextField(max_length=250, null=True)
@@ -142,39 +140,34 @@ class WizardFormJuridica(models.Model):
     barrio = models.CharField(max_length=250, null=True)
     ciudad = models.CharField(max_length=250, null=True)
     departamento = models.CharField(max_length=250, null=True)
-    mobile_phone_fin = models.IntegerField(null=True)
+    mobile_phone_fin = models.CharField(max_length=250, null=True)
     email_fin = models.EmailField(null=True, default="")
 
-    telefono_fijo = models.IntegerField(blank=True, null=True)
-    ingresos = models.IntegerField(blank=True, null=True)
-    total_activos = models.IntegerField(blank=True, null=True)
-    egresos = models.IntegerField(blank=True, null=True)
-    total_pasivos = models.IntegerField(blank=True, null=True)
+    # telefono_fijo = models.CharField(max_length=250, null=True)
+    ingresos = models.CharField(max_length=250, null=True)
+    total_activos = models.CharField(max_length=250, null=True)
+    egresos = models.CharField(max_length=250, null=True)
+    total_pasivos = models.CharField(max_length=250, null=True)
     # ****************************step4************************************
 
     uploader = models.CharField(max_length=250, null=True, default="")
-    firstFile = models.FileField(upload_to='documents', blank=True, validators=[
-                                 validate_file_extension], null=True)
-    secondFile = models.FileField(upload_to='documents', blank=True, validators=[
-                                  validate_file_extension], null=True)
+    firstFile = models.FileField(
+        upload_to='documents', blank=True, null=True, validators=[validate_file_extension])
+    secondFile = models.FileField(
+        upload_to='documents', blank=True, null=True, validators=[validate_file_extension])
     # ****************************step5************************************
 
     name_info = models.CharField(max_length=250, null=True)
     email_info = models.EmailField(null=True, default="")
     lastname_info = models.CharField(max_length=250, null=True)
-    number_info = models.IntegerField(null=True)
+    number_info = models.CharField(max_length=250, null=True)
 
-    id_image1 = models.ImageField(upload_to='user_images/id_images',
-                                  blank=True, validators=[validate_file_extension], null=True)
-    id_image2 = models.ImageField(upload_to='user_images/id_images',
-                                  blank=True, validators=[validate_file_extension], null=True)
+    id_image1 = models.ImageField(upload_to='user_images/id_images', null=True)
+    id_image2 = models.ImageField(upload_to='user_images/id_images', null=True)
 
-    client_image1 = models.ImageField(
-        upload_to='user_images/', blank=True, validators=[validate_file_extension], null=True)
-    client_image2 = models.ImageField(
-        upload_to='user_images/', blank=True, validators=[validate_file_extension], null=True)
-    client_image3 = models.ImageField(
-        upload_to='user_images/', blank=True, validators=[validate_file_extension], null=True)
+    client_image1 = models.ImageField(upload_to='user_images/', null=True)
+    client_image2 = models.ImageField(upload_to='user_images/', null=True)
+    client_image3 = models.ImageField(upload_to='user_images/', null=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     status = models.BooleanField(default=False)
@@ -193,9 +186,9 @@ class WizardFormJuridica(models.Model):
 
 
 class phoneModel(models.Model):
-    Mobile = models.IntegerField(blank=False)
+    Mobile = models.BigIntegerField(blank=False)
     isVerified = models.BooleanField(blank=False, default=False)
-    counter = models.IntegerField(default=0, blank=False)
+    counter = models.BigIntegerField(default=0, blank=False)
 
     def __str__(self):
         return str(self.Mobile)
@@ -204,10 +197,10 @@ class phoneModel(models.Model):
 class Partner(models.Model):
     main = models.ForeignKey(WizardFormJuridica, on_delete=models.CASCADE)
     name_razonsocial = models.TextField(max_length=250, null=True)
-    participacion = models.IntegerField(null=True)
+    participacion = models.CharField(max_length=250, null=True)
     identification = models.CharField(max_length=250, null=True)
     number = models.CharField(max_length=250, null=True)
-    ciudad = models.CharField(max_length=250, null=True)
+    ciudad_partiner = models.CharField(max_length=250, null=True)
     direccion = models.CharField(max_length=250, null=True)
 
     def __str__(self):
@@ -245,24 +238,3 @@ class Email(models.Model):
 
     def __str__(self):
         return str(self.email)
-
-
-class AuthToken(models.Model):
-    key = models.CharField(verbose_name='Key', max_length=40, primary_key=True)
-    created = models.DateTimeField(
-        verbose_name='Creation date', auto_now_add=True)
-
-    class Meta:
-        verbose_name = 'Token'
-        verbose_name_plural = 'Tokens'
-
-    def save(self, *args, **kwargs):
-        if not self.key:
-            self.key = self.generate_key()
-        return super().save(*args, **kwargs)
-
-    def generate_key(self):
-        return binascii.hexlify(os.urandom(20)).decode()
-
-    def __str__(self):
-        return self.key
