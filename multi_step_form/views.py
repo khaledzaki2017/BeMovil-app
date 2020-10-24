@@ -72,9 +72,9 @@ class WizardFormNaturalListView(viewsets.ModelViewSet):
         files_list = request.FILES
         wizardData = request.data
 
-        serializer = self.serializer_class(
-            data={"data": wizardData, "files": files_list})
-        # serializer = self.serializer_class(data=wizardData)
+        # serializer = self.serializer_class(
+        #     data={"data": wizardData, "files": files_list})
+        serializer = self.serializer_class(data=wizardData)
         if serializer.is_valid(raise_exception=True):
             serializer.save()
             wizard_data = serializer.data
@@ -129,9 +129,9 @@ class WizardFormJuridicaListView(viewsets.ModelViewSet):
         files_list = request.FILES
         wizardData = request.data
 
-        serializer = self.serializer_class(
-            data={"data": wizardData, "files": files_list})
-        # serializer = self.serializer_class(data=wizardData)
+        # serializer = self.serializer_class(
+        #     data={"data": wizardData, "files": files_list})
+        serializer = self.serializer_class(data=wizardData)
         if serializer.is_valid(raise_exception=True):
             serializer.save()
             wizard_data = serializer.data
