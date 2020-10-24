@@ -47,7 +47,7 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework import viewsets, status
 from rest_framework.views import APIView
-from rest_framework.parsers import MultiPartParser, FormParser
+from rest_framework.parsers import MultiPartParser, FormParser, FileUploadParser
 import logging
 logger = logging.getLogger('django')
 # **************************************************************************************
@@ -71,15 +71,12 @@ class WizardFormNaturalListView(viewsets.ModelViewSet):
     def create(self, request):
         files_list = request.FILES
         wizardData = request.data
-        # firstUploaded_files = request.FILES.getlist('firstFile')
-        # secondUploaded_files = request.FILES.getlist('secondFile')
+        if request.FILES.getlist('firstFile') == null:
+            print("firstFile is null")
 
-        # uploader = dict(request.data)['uploader'][0]
-        # upload_handler(firstUploaded_files, uploader)
-        # upload_handler(secondUploaded_files, uploader)
         serializer = self.serializer_class(
             data={"data": wizardData, "files": files_list})
-        serializer = self.serializer_class(data=wizardData)
+        # serializer = self.serializer_class(data=wizardData)
         if serializer.is_valid(raise_exception=True):
             serializer.save()
             wizard_data = serializer.data
@@ -133,16 +130,12 @@ class WizardFormJuridicaListView(viewsets.ModelViewSet):
     def create(self, request):
         files_list = request.FILES
         wizardData = request.data
-        # firstUploaded_files = request.FILES.getlist('firstFile')
-        # secondUploaded_files = request.FILES.getlist('secondFile')
-
-        # uploader = dict(request.data)['uploader'][0]
-        # upload_handler(firstUploaded_files, uploader)
-        # upload_handler(secondUploaded_files, uploader)
+        if request.FILES.getlist('firstFile') == null:
+            print("firstFile is null")
 
         serializer = self.serializer_class(
             data={"data": wizardData, "files": files_list})
-        serializer = self.serializer_class(data=wizardData)
+        # serializer = self.serializer_class(data=wizardData)
         if serializer.is_valid(raise_exception=True):
             serializer.save()
             wizard_data = serializer.data
