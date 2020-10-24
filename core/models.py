@@ -55,7 +55,7 @@ class WizardFormNatural(models.Model):
     expedition_date = models.DateField(null=True)
     expedition_place = models.CharField(max_length=250, null=True)
     mobile_phone = models.IntegerField(null=True)
-    number = models.IntegerField(null=True)
+    number = models.CharField(max_length=250, null=True)
 
     address = models.TextField(max_length=250, null=True)
     city = models.CharField(max_length=250, null=True)
@@ -79,8 +79,10 @@ class WizardFormNatural(models.Model):
     # ****************************step4************************************
 
     uploader = models.CharField(max_length=250, null=True, default="")
-    firstFile = models.FileField(upload_to='documents',blank=True,validators=[validate_file_extension], null=True)
-    secondFile = models.FileField(upload_to='documents',blank=True,validators=[validate_file_extension], null=True)
+    firstFile = models.FileField(upload_to='documents', blank=True, validators=[
+                                 validate_file_extension], null=True)
+    secondFile = models.FileField(upload_to='documents', blank=True, validators=[
+                                  validate_file_extension], null=True)
     # ****************************step5************************************
 
     name_info = models.CharField(max_length=250, null=True)
@@ -88,12 +90,17 @@ class WizardFormNatural(models.Model):
     lastname_info = models.CharField(max_length=250, null=True)
     number_info = models.IntegerField(null=True)
 
-    id_image1 = models.ImageField(upload_to='user_images/id_images',blank=True,validators=[validate_file_extension], null=True)
-    id_image2 = models.ImageField(upload_to='user_images/id_images',blank=True,validators=[validate_file_extension], null=True)
+    id_image1 = models.ImageField(upload_to='user_images/id_images',
+                                  blank=True, validators=[validate_file_extension], null=True)
+    id_image2 = models.ImageField(upload_to='user_images/id_images',
+                                  blank=True, validators=[validate_file_extension], null=True)
 
-    client_image1 = models.ImageField(upload_to='user_images/',blank=True,validators=[validate_file_extension], null=True)
-    client_image2 = models.ImageField(upload_to='user_images/',blank=True,validators=[validate_file_extension], null=True)
-    client_image3 = models.ImageField(upload_to='user_images/', blank=True,validators=[validate_file_extension],null=True)
+    client_image1 = models.ImageField(
+        upload_to='user_images/', blank=True, validators=[validate_file_extension], null=True)
+    client_image2 = models.ImageField(
+        upload_to='user_images/', blank=True, validators=[validate_file_extension], null=True)
+    client_image3 = models.ImageField(
+        upload_to='user_images/', blank=True, validators=[validate_file_extension], null=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     status = models.BooleanField(default=False)
@@ -122,7 +129,7 @@ class WizardFormJuridica(models.Model):
     expedition_date = models.DateField(null=True)
     expedition_place = models.CharField(max_length=250, null=True)
     mobile_phone = models.IntegerField(null=True)
-    number = models.IntegerField(null=True)
+    number = models.CharField(max_length=250, null=True)
 
     address = models.TextField(max_length=250, null=True)
     city = models.CharField(max_length=250, null=True)
@@ -146,8 +153,10 @@ class WizardFormJuridica(models.Model):
     # ****************************step4************************************
 
     uploader = models.CharField(max_length=250, null=True, default="")
-    firstFile = models.FileField(upload_to='documents',blank=True,validators=[validate_file_extension],null=True)
-    secondFile = models.FileField(upload_to='documents', blank=True,validators=[validate_file_extension],null=True)
+    firstFile = models.FileField(upload_to='documents', blank=True, validators=[
+                                 validate_file_extension], null=True)
+    secondFile = models.FileField(upload_to='documents', blank=True, validators=[
+                                  validate_file_extension], null=True)
     # ****************************step5************************************
 
     name_info = models.CharField(max_length=250, null=True)
@@ -155,12 +164,17 @@ class WizardFormJuridica(models.Model):
     lastname_info = models.CharField(max_length=250, null=True)
     number_info = models.IntegerField(null=True)
 
-    id_image1 = models.ImageField(upload_to='user_images/id_images', blank=True,validators=[validate_file_extension],null=True)
-    id_image2 = models.ImageField(upload_to='user_images/id_images', blank=True,validators=[validate_file_extension],null=True)
+    id_image1 = models.ImageField(upload_to='user_images/id_images',
+                                  blank=True, validators=[validate_file_extension], null=True)
+    id_image2 = models.ImageField(upload_to='user_images/id_images',
+                                  blank=True, validators=[validate_file_extension], null=True)
 
-    client_image1 = models.ImageField(upload_to='user_images/',blank=True,validators=[validate_file_extension], null=True)
-    client_image2 = models.ImageField(upload_to='user_images/',blank=True,validators=[validate_file_extension], null=True)
-    client_image3 = models.ImageField(upload_to='user_images/',blank=True,validators=[validate_file_extension], null=True)
+    client_image1 = models.ImageField(
+        upload_to='user_images/', blank=True, validators=[validate_file_extension], null=True)
+    client_image2 = models.ImageField(
+        upload_to='user_images/', blank=True, validators=[validate_file_extension], null=True)
+    client_image3 = models.ImageField(
+        upload_to='user_images/', blank=True, validators=[validate_file_extension], null=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     status = models.BooleanField(default=False)
@@ -192,7 +206,7 @@ class Partner(models.Model):
     name_razonsocial = models.TextField(max_length=250, null=True)
     participacion = models.IntegerField(null=True)
     identification = models.CharField(max_length=250, null=True)
-    number = models.IntegerField(null=True)
+    number = models.CharField(max_length=250, null=True)
     ciudad = models.CharField(max_length=250, null=True)
     direccion = models.CharField(max_length=250, null=True)
 
